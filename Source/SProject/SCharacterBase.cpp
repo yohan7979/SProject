@@ -4,6 +4,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "SAnimationHandler.h"
+#include "SAttributeComponent.h"
+#include "Net/UnrealNetwork.h"
 
 ASCharacterBase::ASCharacterBase()
 {
@@ -17,12 +19,15 @@ ASCharacterBase::ASCharacterBase()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	AnimationHandler = CreateDefaultSubobject<USAnimationHandler>(TEXT("AnimationHandler"));
+
+	AttributeComp = CreateDefaultSubobject<USAttributeComponent>(TEXT("AttributeComp"));
 }
 
 void ASCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	AttributeComp->OnHealthChanged.AddDynamic(this, &ASCharacterBase::OnHealthChanged);
 }
 
 void ASCharacterBase::Tick(float DeltaTime)
@@ -63,3 +68,12 @@ void ASCharacterBase::SetWeaponCollision(EWeaponCollisionType eType, bool bEnabl
 	}
 }
 
+void ASCharacterBase::OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController)
+{
+	UE_LOG(LogTemp, Warning, TEXT("CurrentHealth : %f, Damage : %f"), CurrentHealth, DamageAmount);
+}
+
+void ASCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}

@@ -10,6 +10,7 @@
 class UCameraComponent;
 class USpringArmComponent;
 class USAnimationHandler;
+class USAttributeComponent;
 
 
 UENUM()
@@ -31,6 +32,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	virtual void Tick(float DeltaTime) override;
@@ -40,6 +42,9 @@ public:
 
 	void SetWeaponCollision(EWeaponCollisionType eType, bool bEnable);
 
+	UFUNCTION()
+	void OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController);
+	
 protected:
 	UPROPERTY(EditAnywhere)
 	UCameraComponent*		CameraComp;
@@ -50,9 +55,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	USAnimationHandler*		AnimationHandler;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UCapsuleComponent*		LeftWeaponCollComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UCapsuleComponent*		RightWeaponCollComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	USAttributeComponent*	AttributeComp;
 };
