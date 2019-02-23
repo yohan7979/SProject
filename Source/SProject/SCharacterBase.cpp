@@ -20,8 +20,9 @@ ASCharacterBase::ASCharacterBase()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	AnimationHandler = CreateDefaultSubobject<USAnimationHandler>(TEXT("AnimationHandler"));
-
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>(TEXT("AttributeComp"));
+
+	ComboCount = 0;
 }
 
 void ASCharacterBase::BeginPlay()
@@ -35,6 +36,11 @@ void ASCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// 콤보 카운팅 초기화
+	if (ComboCount > 0 && GetWorld()->TimeSeconds - LastAttackTime > ComboCountKeepingTime)
+	{
+		ComboCount = 0;
+	}
 }
 
 void ASCharacterBase::Move(const FVector& Direction, float fValue)
@@ -42,7 +48,21 @@ void ASCharacterBase::Move(const FVector& Direction, float fValue)
 	AddMovementInput(Direction, fValue);
 }
 
-void ASCharacterBase::NormalAttack()
+void ASCharacterBase::BeginAttack()
+{
+	if (GetWorldTimerManager().IsTimerActive(Timer_AttackCooldown))
+		return;
+
+	float FirstDelay = FMath::Max(0.f,  LastAttackTime - GetWorld()->GetTimeSeconds() + AttackCooldown);
+	GetWorldTimerManager().SetTimer(Timer_AttackCooldown, this, &ASCharacterBase::DoAttack, AttackCooldown, true, FirstDelay);
+}
+
+void ASCharacterBase::EndAttack()
+{
+	GetWorldTimerManager().ClearTimer(Timer_AttackCooldown);
+}
+
+void ASCharacterBase::DoAttack()
 {
 
 }

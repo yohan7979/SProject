@@ -25,7 +25,8 @@ public:
 	void MoveRight(float fValue);
 	void Turn(float fValue);
 	void LookUp(float fValue);
-	void NormalAttack();
+	void BeginAttack();
+	void EndAttack();
 	void Jump();
 
 	

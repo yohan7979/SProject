@@ -20,7 +20,8 @@ void ASPlayerController::SetupInputComponent()
 	InputComponent->BindAxis("Turn", this, &ASPlayerController::Turn);
 	InputComponent->BindAxis("LookUp", this, &ASPlayerController::LookUp);
 
-	InputComponent->BindAction("NormalAttack", IE_Pressed, this, &ASPlayerController::NormalAttack);
+	InputComponent->BindAction("Attack", IE_Pressed, this, &ASPlayerController::BeginAttack);
+	InputComponent->BindAction("Attack", IE_Released, this, &ASPlayerController::EndAttack);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ASPlayerController::Jump);
 }
 
@@ -60,11 +61,19 @@ void ASPlayerController::LookUp(float fValue)
 	AddPitchInput(fValue);
 }
 
-void ASPlayerController::NormalAttack()
+void ASPlayerController::BeginAttack()
 {
 	if (CachedCharacter != nullptr)
 	{
-		CachedCharacter->NormalAttack();
+		CachedCharacter->BeginAttack();
+	}
+}
+
+void ASPlayerController::EndAttack()
+{
+	if (CachedCharacter != nullptr)
+	{
+		CachedCharacter->EndAttack();
 	}
 }
 

@@ -25,7 +25,10 @@ enum class EWeaponCollisionType
 UENUM()
 enum class EAnimMontageType
 {
-	EAMT_Melee,
+	EAMT_NormalAttack_A,
+	EAMT_NormalAttack_B,
+	EAMT_NormalAttack_C,
+	EAMT_NormalAttack_D,
 	EAMT_MAX
 };
 
@@ -55,7 +58,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void Move(const FVector& Direction, float fValue);
-	virtual void NormalAttack();
+	void BeginAttack();
+	void EndAttack();
+	virtual void DoAttack();
 
 	void SetWeaponCollision(EWeaponCollisionType eType, bool bEnable);
 
@@ -80,4 +85,15 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	USAttributeComponent*	AttributeComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float AttackCooldown;
+	FTimerHandle Timer_AttackCooldown;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float LastAttackTime;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float ComboCountKeepingTime;
+	int8 ComboCount;
 };

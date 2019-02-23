@@ -22,7 +22,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	virtual void NormalAttack() override;
+	virtual void DoAttack() override;
 
 	UFUNCTION()
 	void OnLeftCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
