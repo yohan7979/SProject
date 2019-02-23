@@ -2,7 +2,6 @@
 
 #include "SAnimationHandler.h"
 #include "Animation/AnimMontage.h"
-#include "SCharacterBase.h"
 
 USAnimationHandler::USAnimationHandler()
 {

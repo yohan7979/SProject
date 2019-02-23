@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SCharacterBase.h"
 #include "Components/ActorComponent.h"
 #include "SAnimationHandler.generated.h"
 
 class UAnimMontage;
-class ASCharacterBase;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPROJECT_API USAnimationHandler : public UActorComponent
@@ -30,7 +30,7 @@ public:
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category="AnimMontage")
-	UAnimMontage* AnimMontageList[EAMT_MAX];
+	TMap<EAnimMontageType, UAnimMontage*> AnimMontageList;
 
 	ASCharacterBase* CachedCharacter;
 };

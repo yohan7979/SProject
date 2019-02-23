@@ -22,6 +22,13 @@ enum class EWeaponCollisionType
 	EWCT_MAX
 };
 
+UENUM()
+enum class EAnimMontageType
+{
+	EAMT_Melee,
+	EAMT_MAX
+};
+
 UCLASS()
 class SPROJECT_API ASCharacterBase : public ACharacter
 {
@@ -33,6 +40,16 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerRequestDealDamage(AActor* OtherActor, float BaseDamage);
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerDoSpecialAction(EAnimMontageType eType);
+
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void MulticastDoSpecialAction(EAnimMontageType eType);
+	virtual void DoSpeicalAction(EAnimMontageType eType);
 
 public:
 	virtual void Tick(float DeltaTime) override;
