@@ -3,11 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SCharacterBase.h"
 #include "Components/ActorComponent.h"
 #include "SAnimationHandler.generated.h"
 
 class UAnimMontage;
+class ASCharacterBase;
+
+UENUM()
+enum class EAnimMontageType
+{
+	EAMT_None,
+	EAMT_NormalAttack_A,
+	EAMT_NormalAttack_B,
+	EAMT_NormalAttack_C,
+	EAMT_NormalAttack_D,
+	EAMT_Death_A,
+	EAMT_Death_B
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPROJECT_API USAnimationHandler : public UActorComponent

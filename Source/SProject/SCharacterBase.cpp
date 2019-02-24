@@ -3,10 +3,10 @@
 #include "SCharacterBase.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "SAnimationHandler.h"
 #include "SAttributeComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
+#include "SPlayerController.h"
 
 ASCharacterBase::ASCharacterBase()
 {
@@ -53,7 +53,7 @@ void ASCharacterBase::BeginAttack()
 	if (GetWorldTimerManager().IsTimerActive(Timer_AttackCooldown))
 		return;
 
-	float FirstDelay = FMath::Max(0.f,  LastAttackTime - GetWorld()->GetTimeSeconds() + AttackCooldown);
+	float FirstDelay = FMath::Max(0.f,  LastAttackTime + AttackCooldown - GetWorld()->GetTimeSeconds());
 	GetWorldTimerManager().SetTimer(Timer_AttackCooldown, this, &ASCharacterBase::DoAttack, AttackCooldown, true, FirstDelay);
 }
 
@@ -91,12 +91,12 @@ void ASCharacterBase::SetWeaponCollision(EWeaponCollisionType eType, bool bEnabl
 
 void ASCharacterBase::OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Causer : %s, Actor: %s, CurrentHealth : %f, Damage : %f"), *DamageCauser->GetName(), *GetName(), CurrentHealth, DamageAmount);
-}
+	if (CurrentHealth <= 0.f && !bDied)
+	{
+		ServerSetDied(true);
+	}
 
-void ASCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	UE_LOG(LogTemp, Warning, TEXT("Causer : %s, Actor: %s, CurrentHealth : %f, Damage : %f"), *DamageCauser->GetName(), *GetName(), CurrentHealth, DamageAmount);
 }
 
 void ASCharacterBase::DoSpeicalAction(EAnimMontageType eType)
@@ -105,6 +105,43 @@ void ASCharacterBase::DoSpeicalAction(EAnimMontageType eType)
 	{
 		AnimationHandler->PlayAnimationMontage(eType);
 	}
+}
+
+void ASCharacterBase::OnRep_Died()
+{
+	if (bDied)
+	{
+		int iDeathIndex = FMath::Rand() % 2;
+		DoSpeicalAction(iDeathIndex == 0 ? EAnimMontageType::EAMT_Death_A : EAnimMontageType::EAMT_Death_B);
+
+		// 클라이언트 자신에 해당
+		if (IsLocallyControlled())
+		{
+			ASPlayerController* PC = Cast<ASPlayerController>(GetController());
+			if (PC)
+			{
+				PC->SetControlledPawn(nullptr);
+				PC->UnPossess();
+			}
+		}
+
+		// 콜리젼 off
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+		if (LeftWeaponCollComp)		LeftWeaponCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		if (RightWeaponCollComp)	RightWeaponCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void ASCharacterBase::ServerSetDied_Implementation(bool isDie)
+{
+	bDied = isDie;
+
+	OnRep_Died();
+}
+
+bool ASCharacterBase::ServerSetDied_Validate(bool isDie)
+{
+	return true;
 }
 
 void ASCharacterBase::MulticastDoSpecialAction_Implementation(EAnimMontageType eType)
@@ -141,4 +178,11 @@ void ASCharacterBase::ServerRequestDealDamage_Implementation(AActor* OtherActor,
 bool ASCharacterBase::ServerRequestDealDamage_Validate(AActor* OtherActor, float BaseDamage)
 {
 	return BaseDamage != 0.f;
+}
+
+void ASCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASCharacterBase, bDied);
 }

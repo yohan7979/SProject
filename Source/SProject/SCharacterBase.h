@@ -5,31 +5,21 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
+#include "SAnimationHandler.h"
 #include "SCharacterBase.generated.h"
 
 class UCameraComponent;
 class USpringArmComponent;
-class USAnimationHandler;
 class USAttributeComponent;
 
 
 UENUM()
 enum class EWeaponCollisionType
 {
+	EWCT_None,
 	EWCT_Left,
 	EWCT_Right,
-	EWCT_ETC,
-	EWCT_MAX
-};
-
-UENUM()
-enum class EAnimMontageType
-{
-	EAMT_NormalAttack_A,
-	EAMT_NormalAttack_B,
-	EAMT_NormalAttack_C,
-	EAMT_NormalAttack_D,
-	EAMT_MAX
+	EWCT_ETC
 };
 
 UCLASS()
@@ -54,6 +44,12 @@ protected:
 	void MulticastDoSpecialAction(EAnimMontageType eType);
 	virtual void DoSpeicalAction(EAnimMontageType eType);
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSetDied(bool isDie);
+	
+	UFUNCTION()
+	virtual void OnRep_Died();
+
 public:
 	virtual void Tick(float DeltaTime) override;
 
@@ -68,10 +64,10 @@ public:
 	void OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController);
 	
 protected:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	UCameraComponent*		CameraComp;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent*	SpringArmComp;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -87,6 +83,9 @@ protected:
 	USAttributeComponent*	AttributeComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float NormalDamage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float AttackCooldown;
 	FTimerHandle Timer_AttackCooldown;
 
@@ -96,4 +95,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float ComboCountKeepingTime;
 	int8 ComboCount;
+
+	UPROPERTY(ReplicatedUsing=OnRep_Died, BlueprintReadOnly)
+	bool bDied;
 };

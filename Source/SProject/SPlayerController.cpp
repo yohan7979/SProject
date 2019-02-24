@@ -81,3 +81,8 @@ void ASPlayerController::Jump()
 {
 	UE_LOG(LogTemp, Log, TEXT("Jump!"));
 }
+
+void ASPlayerController::SetControlledPawn(ASCharacterBase* InPawn)
+{
+	CachedCharacter = InPawn;
+}

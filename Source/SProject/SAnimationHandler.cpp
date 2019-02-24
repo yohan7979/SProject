@@ -2,13 +2,10 @@
 
 #include "SAnimationHandler.h"
 #include "Animation/AnimMontage.h"
+#include "SCharacterBase.h"
 
 USAnimationHandler::USAnimationHandler()
 {
-	AnimMontageList.Add(EAnimMontageType::EAMT_NormalAttack_A, nullptr);
-	AnimMontageList.Add(EAnimMontageType::EAMT_NormalAttack_B, nullptr);
-	AnimMontageList.Add(EAnimMontageType::EAMT_NormalAttack_C, nullptr);
-	AnimMontageList.Add(EAnimMontageType::EAMT_NormalAttack_D, nullptr);
 }
 
 
@@ -25,9 +22,16 @@ void USAnimationHandler::PlayAnimationMontage(EAnimMontageType eAnimType)
 	if (CachedCharacter == nullptr)
 		return;
 
+	UAnimMontage* DesireToPlay = AnimMontageList[eAnimType];
+	if (DesireToPlay != nullptr)
+	{
+		CachedCharacter->PlayAnimMontage(DesireToPlay);
+	}
+/*
 	if (AnimMontageList[eAnimType] != nullptr)
 	{
 		CachedCharacter->PlayAnimMontage(AnimMontageList[eAnimType]);
 	}
+*/
 }
 

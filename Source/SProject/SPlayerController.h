@@ -29,6 +29,7 @@ public:
 	void EndAttack();
 	void Jump();
 
+	void SetControlledPawn(ASCharacterBase* InPawn);
 	
 protected:
 	ASCharacterBase* CachedCharacter;

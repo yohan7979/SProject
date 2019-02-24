@@ -15,6 +15,7 @@ ASCharacterBase_Kallari::ASCharacterBase_Kallari()
 
 	AttackCooldown = 1.f;
 	ComboCountKeepingTime = 1.5f;
+	NormalDamage = 20.f;
 }
 
 void ASCharacterBase_Kallari::BeginPlay()
@@ -64,7 +65,7 @@ void ASCharacterBase_Kallari::OnLeftCollisionBeginOverlap(UPrimitiveComponent * 
 {
 	if (IsLocallyControlled() && OtherActor != this)
 	{
-		ServerRequestDealDamage(OtherActor, 20.f);
+		ServerRequestDealDamage(OtherActor, NormalDamage);
 		UE_LOG(LogTemp, Warning, TEXT("LeftCollide is occured, RequestServer to DEAL DAMAGE!"));
 	}
 }
@@ -73,7 +74,7 @@ void ASCharacterBase_Kallari::OnRightCollisionBeginOverlap(UPrimitiveComponent *
 {
 	if (IsLocallyControlled() && OtherActor != this)
 	{
-		ServerRequestDealDamage(OtherActor, 20.f);
+		ServerRequestDealDamage(OtherActor, NormalDamage);
 		UE_LOG(LogTemp, Warning, TEXT("RightCollide is occured, RequestServer to DEAL DAMAGE!"));
 	}	
 }
