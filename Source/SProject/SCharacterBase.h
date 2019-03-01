@@ -57,6 +57,7 @@ public:
 	void BeginAttack();
 	void EndAttack();
 	virtual void DoAttack();
+	virtual void DoJump();
 
 	void SetWeaponCollision(EWeaponCollisionType eType, bool bEnable);
 

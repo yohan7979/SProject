@@ -79,7 +79,10 @@ void ASPlayerController::EndAttack()
 
 void ASPlayerController::Jump()
 {
-	UE_LOG(LogTemp, Log, TEXT("Jump!"));
+	if (CachedCharacter != nullptr)
+	{
+		CachedCharacter->DoJump();
+	}
 }
 
 void ASPlayerController::SetControlledPawn(ASCharacterBase* InPawn)

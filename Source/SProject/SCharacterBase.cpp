@@ -67,6 +67,11 @@ void ASCharacterBase::DoAttack()
 
 }
 
+void ASCharacterBase::DoJump()
+{
+	Jump();
+}
+
 void ASCharacterBase::SetWeaponCollision(EWeaponCollisionType eType, bool bEnable)
 {
 	UCapsuleComponent* TargetCollComp = nullptr;
