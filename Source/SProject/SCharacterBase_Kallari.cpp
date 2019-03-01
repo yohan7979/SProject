@@ -16,6 +16,7 @@ ASCharacterBase_Kallari::ASCharacterBase_Kallari()
 	AttackCooldown = 1.f;
 	ComboCountKeepingTime = 1.5f;
 	NormalDamage = 20.f;
+	MaxComboCount = 3;
 }
 
 void ASCharacterBase_Kallari::BeginPlay()
@@ -44,13 +45,18 @@ void ASCharacterBase_Kallari::DoAttack()
 	case 2:
 		DesiredType = EAnimMontageType::EAMT_NormalAttack_C;
 		break;
-	case 3:
-		DesiredType = EAnimMontageType::EAMT_NormalAttack_D;
-		break;
 	}
 
 	// 로컬 클라이언트에서 쿨타임, 콤보 카운팅 계산
-	ComboCount < 3 ? ++ComboCount : ComboCount = 0;
+	if (bRandomCombo)
+	{
+		ComboCount = FMath::Rand() % MaxComboCount;
+	}
+	else
+	{
+		ComboCount < MaxComboCount - 1 ? ++ComboCount : ComboCount = 0;
+	}
+
 	LastAttackTime = GetWorld()->GetTimeSeconds();
 	
 	DoSpeicalAction(DesiredType);

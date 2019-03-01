@@ -22,16 +22,10 @@ void USAnimationHandler::PlayAnimationMontage(EAnimMontageType eAnimType)
 	if (CachedCharacter == nullptr)
 		return;
 
-	UAnimMontage* DesireToPlay = AnimMontageList[eAnimType];
+	UAnimMontage* DesireToPlay = *AnimMontageList.Find(eAnimType);
 	if (DesireToPlay != nullptr)
 	{
 		CachedCharacter->PlayAnimMontage(DesireToPlay);
 	}
-/*
-	if (AnimMontageList[eAnimType] != nullptr)
-	{
-		CachedCharacter->PlayAnimMontage(AnimMontageList[eAnimType]);
-	}
-*/
 }
 

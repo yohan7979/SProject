@@ -92,8 +92,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float LastAttackTime;
 
+	UPROPERTY(EditDefaultsOnly)
+	bool bRandomCombo;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float ComboCountKeepingTime;
+
+	UPROPERTY(EditDefaultsOnly)
+	int8 MaxComboCount;
 	int8 ComboCount;
 
 	UPROPERTY(ReplicatedUsing=OnRep_Died, BlueprintReadOnly)
