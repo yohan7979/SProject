@@ -6,10 +6,11 @@
 #include "Math/UnrealMath.h"
 
 // Sets default values for this component's properties
-USAttributeComponent::USAttributeComponent() : MaxHelth(200.f)
+USAttributeComponent::USAttributeComponent() : MaxHelth(200.f), MaxMana(100.f)
 {
 	SetIsReplicated(true);
 	CurrentHealth = MaxHelth;
+	CurrentMana = MaxMana;
 }
 
 
@@ -40,4 +41,5 @@ void USAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(USAttributeComponent, CurrentHealth);
+	DOREPLIFETIME(USAttributeComponent, CurrentMana);
 }

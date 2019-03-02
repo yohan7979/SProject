@@ -23,6 +23,10 @@ protected:
 
 public:
 	virtual void DoAttack() override;
+	virtual bool ExecuteAbilityOne() override;
+	virtual bool ExecuteAbilityTwo() override;
+	virtual bool ExecuteAbilityThree() override;
+	virtual bool ExecuteAbilityFour() override;
 
 	UFUNCTION()
 	void OnLeftCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 

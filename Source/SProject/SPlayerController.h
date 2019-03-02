@@ -29,6 +29,11 @@ public:
 	void EndAttack();
 	void Jump();
 
+	void AbilityOne();
+	void AbilityTwo();
+	void AbilityThree();
+	void AbliityFour();
+
 	void SetControlledPawn(ASCharacterBase* InPawn);
 	
 protected:

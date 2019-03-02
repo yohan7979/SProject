@@ -11,6 +11,7 @@
 class UCameraComponent;
 class USpringArmComponent;
 class USAttributeComponent;
+class USAbilityComponent;
 
 
 UENUM()
@@ -52,12 +53,19 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+	USAttributeComponent* GetAttributeComp() const { return AttributeComp; }
+
 
 	void Move(const FVector& Direction, float fValue);
 	void BeginAttack();
 	void EndAttack();
 	virtual void DoAttack();
 	virtual void DoJump();
+
+	virtual bool ExecuteAbilityOne();
+	virtual bool ExecuteAbilityTwo();
+	virtual bool ExecuteAbilityThree();
+	virtual bool ExecuteAbilityFour();
 
 	void SetWeaponCollision(EWeaponCollisionType eType, bool bEnable);
 
@@ -82,6 +90,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	USAttributeComponent*	AttributeComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	USAbilityComponent*		AbilityComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float NormalDamage;

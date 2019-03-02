@@ -17,6 +17,7 @@ enum class EAnimMontageType
 	EAMT_NormalAttack_B,
 	EAMT_NormalAttack_C,
 	EAMT_NormalAttack_D,
+	EAMT_Ability_One,
 	EAMT_Death_A,
 	EAMT_Death_B
 };

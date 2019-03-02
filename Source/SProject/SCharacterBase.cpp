@@ -7,6 +7,8 @@
 #include "Net/UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
 #include "SPlayerController.h"
+#include "SAbilityComponent.h"
+#include "Skill.h"
 
 ASCharacterBase::ASCharacterBase()
 {
@@ -21,6 +23,7 @@ ASCharacterBase::ASCharacterBase()
 
 	AnimationHandler = CreateDefaultSubobject<USAnimationHandler>(TEXT("AnimationHandler"));
 	AttributeComp = CreateDefaultSubobject<USAttributeComponent>(TEXT("AttributeComp"));
+	AbilityComp = CreateDefaultSubobject<USAbilityComponent>(TEXT("AbilityComp"));
 
 	ComboCount = 0;
 }
@@ -70,6 +73,46 @@ void ASCharacterBase::DoAttack()
 void ASCharacterBase::DoJump()
 {
 	Jump();
+}
+
+bool ASCharacterBase::ExecuteAbilityOne()
+{
+	if (AbilityComp != nullptr)
+	{
+		return AbilityComp->ExecuteSkill(EAbilitySlotType::EAST_One);
+	}
+
+	return false;
+}
+
+bool ASCharacterBase::ExecuteAbilityTwo()
+{
+	if (AbilityComp != nullptr)
+	{
+		return AbilityComp->ExecuteSkill(EAbilitySlotType::EAST_Two);
+	}
+
+	return false;
+}
+
+bool ASCharacterBase::ExecuteAbilityThree()
+{
+	if (AbilityComp != nullptr)
+	{
+		return AbilityComp->ExecuteSkill(EAbilitySlotType::EAST_Three);
+	}
+
+	return false;
+}
+
+bool ASCharacterBase::ExecuteAbilityFour()
+{
+	if (AbilityComp != nullptr)
+	{
+		return AbilityComp->ExecuteSkill(EAbilitySlotType::EAST_Four);
+	}
+
+	return false;
 }
 
 void ASCharacterBase::SetWeaponCollision(EWeaponCollisionType eType, bool bEnable)

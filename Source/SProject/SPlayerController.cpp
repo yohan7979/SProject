@@ -23,6 +23,7 @@ void ASPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Attack", IE_Pressed, this, &ASPlayerController::BeginAttack);
 	InputComponent->BindAction("Attack", IE_Released, this, &ASPlayerController::EndAttack);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ASPlayerController::Jump);
+	InputComponent->BindAction("AbilityOne", IE_Pressed, this, &ASPlayerController::AbilityOne);
 }
 
 void ASPlayerController::MoveForward(float fValue)
@@ -82,6 +83,38 @@ void ASPlayerController::Jump()
 	if (CachedCharacter != nullptr)
 	{
 		CachedCharacter->DoJump();
+	}
+}
+
+void ASPlayerController::AbilityOne()
+{
+	if (CachedCharacter != nullptr)
+	{
+		CachedCharacter->ExecuteAbilityOne();
+	}
+}
+
+void ASPlayerController::AbilityTwo()
+{
+	if (CachedCharacter != nullptr)
+	{
+		CachedCharacter->ExecuteAbilityTwo();
+	}
+}
+
+void ASPlayerController::AbilityThree()
+{
+	if (CachedCharacter != nullptr)
+	{
+		CachedCharacter->ExecuteAbilityThree();
+	}
+}
+
+void ASPlayerController::AbliityFour()
+{
+	if (CachedCharacter != nullptr)
+	{
+		CachedCharacter->ExecuteAbilityFour();
 	}
 }
 
