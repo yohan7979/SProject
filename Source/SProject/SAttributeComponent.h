@@ -29,7 +29,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetCurrentMana() { return CurrentMana; }
 	void SetCurrentMana(float InMana) { CurrentMana = InMana; }
-	void AddCurrentMana(float InMana) { FMath::Max(0.f, CurrentMana += InMana); }
+	void AddCurrentMana(float InMana);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSetCurrentMana(float InMana);
 
 	UFUNCTION()
 	void HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
@@ -37,15 +40,15 @@ public:
 private:
 	UPROPERTY(Replicated)
 	float CurrentHealth;
-	float MaxHelth;
-
 	UPROPERTY(Replicated)
 	float CurrentMana;
-	float MaxMana;
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Properties")
+	float MaxHelth;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Properties")
+	float MaxMana;
+
 	UPROPERTY(BlueprintAssignable, Category="Event")
 	FOnHealthChangedSigniture OnHealthChanged;
-
-
 };

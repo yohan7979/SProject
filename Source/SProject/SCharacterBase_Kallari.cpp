@@ -34,20 +34,7 @@ void ASCharacterBase_Kallari::BeginPlay()
 
 void ASCharacterBase_Kallari::DoAttack()
 {
-	// PC에서 처리한 입력을 받아 액션 수행하고, 서버에게 호출한다.
-	EAnimMontageType DesiredType = EAnimMontageType::EAMT_NormalAttack_A;
-	switch (ComboCount)
-	{
-	case 0:
-		DesiredType = EAnimMontageType::EAMT_NormalAttack_A;
-		break;
-	case 1:
-		DesiredType = EAnimMontageType::EAMT_NormalAttack_B;
-		break;
-	case 2:
-		DesiredType = EAnimMontageType::EAMT_NormalAttack_C;
-		break;
-	}
+	Super::DoAttack();
 
 	// 로컬 클라이언트에서 쿨타임, 콤보 카운팅 계산
 	if (bRandomCombo)
@@ -59,14 +46,8 @@ void ASCharacterBase_Kallari::DoAttack()
 		ComboCount < MaxComboCount - 1 ? ++ComboCount : ComboCount = 0;
 	}
 
-	LastAttackTime = GetWorld()->GetTimeSeconds();
-	
-	DoSpeicalAction(DesiredType);
-
-	if (Role < ROLE_Authority)
-	{
-		ServerDoSpecialAction(DesiredType);
-	}
+	GetWorldTimerManager().ClearTimer(TimerHandle_Combo);
+	GetWorldTimerManager().SetTimer(TimerHandle_Combo, this, &ASCharacterBase::ResetComboCount, ComboCountKeepingTime, false);
 }
 
 bool ASCharacterBase_Kallari::ExecuteAbilityOne()

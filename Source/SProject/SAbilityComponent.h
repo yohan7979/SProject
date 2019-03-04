@@ -50,6 +50,7 @@ public:
 public:	
 	UPROPERTY(EditDefaultsOnly)
 	TMap<EAbilitySlotType, TSubclassOf<USkill>> SkillSlotClasses;
+	UPROPERTY() // Reflection
 	TMap<EAbilitySlotType, USkill*> SkillSlots;
 
 private:

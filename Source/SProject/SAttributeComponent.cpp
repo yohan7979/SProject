@@ -28,6 +28,27 @@ void USAttributeComponent::BeginPlay()
 	}
 }
 
+void USAttributeComponent::ServerSetCurrentMana_Implementation(float InMana)
+{
+	SetCurrentMana(InMana);
+}
+
+bool USAttributeComponent::ServerSetCurrentMana_Validate(float InMana)
+{
+	return InMana != 0.f;
+}
+
+void USAttributeComponent::AddCurrentMana(float InMana)
+{
+	float ResultMana = FMath::Max(0.f, CurrentMana += InMana);
+	if (GetOwnerRole() < ROLE_Authority)
+	{
+		ServerSetCurrentMana(ResultMana);
+	}
+
+	SetCurrentMana(ResultMana);
+}
+
 void USAttributeComponent::HandleTakeAnyDamage(AActor * DamagedActor, float Damage, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
 {
 	CurrentHealth -= Damage;

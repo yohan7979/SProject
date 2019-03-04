@@ -61,6 +61,7 @@ public:
 	void EndAttack();
 	virtual void DoAttack();
 	virtual void DoJump();
+	virtual void StopJump();
 
 	virtual bool ExecuteAbilityOne();
 	virtual bool ExecuteAbilityTwo();
@@ -68,6 +69,7 @@ public:
 	virtual bool ExecuteAbilityFour();
 
 	void SetWeaponCollision(EWeaponCollisionType eType, bool bEnable);
+	void ResetComboCount();
 
 	UFUNCTION()
 	void OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController);
@@ -99,10 +101,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float AttackCooldown;
-	FTimerHandle Timer_AttackCooldown;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float LastAttackTime;
+	FTimerHandle TimerHandle_AttackCooldown;
 
 	UPROPERTY(EditDefaultsOnly)
 	bool bRandomCombo;
@@ -113,6 +113,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	int8 MaxComboCount;
 	int8 ComboCount;
+	FTimerHandle TimerHandle_Combo;
 
 	UPROPERTY(ReplicatedUsing=OnRep_Died, BlueprintReadOnly)
 	bool bDied;

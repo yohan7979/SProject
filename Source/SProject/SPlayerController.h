@@ -27,7 +27,7 @@ public:
 	void LookUp(float fValue);
 	void BeginAttack();
 	void EndAttack();
-	void Jump();
+	void Jump(bool bPressed);
 
 	void AbilityOne();
 	void AbilityTwo();
@@ -38,4 +38,7 @@ public:
 	
 protected:
 	ASCharacterBase* CachedCharacter;
+
+private:
+	DECLARE_DELEGATE_OneParam(FJumpInputDelegate, bool);
 };

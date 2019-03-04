@@ -2,6 +2,7 @@
 
 #include "SCharacterBase.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "SAttributeComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -38,12 +39,6 @@ void ASCharacterBase::BeginPlay()
 void ASCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// 콤보 카운팅 초기화
-	if (ComboCount > 0 && GetWorld()->TimeSeconds - LastAttackTime > ComboCountKeepingTime)
-	{
-		ComboCount = 0;
-	}
 }
 
 void ASCharacterBase::Move(const FVector& Direction, float fValue)
@@ -53,26 +48,55 @@ void ASCharacterBase::Move(const FVector& Direction, float fValue)
 
 void ASCharacterBase::BeginAttack()
 {
-	if (GetWorldTimerManager().IsTimerActive(Timer_AttackCooldown))
+	if (GetWorldTimerManager().IsTimerActive(TimerHandle_AttackCooldown))
 		return;
 
 	float FirstDelay = FMath::Max(0.f,  LastAttackTime + AttackCooldown - GetWorld()->GetTimeSeconds());
-	GetWorldTimerManager().SetTimer(Timer_AttackCooldown, this, &ASCharacterBase::DoAttack, AttackCooldown, true, FirstDelay);
+	GetWorldTimerManager().SetTimer(TimerHandle_AttackCooldown, this, &ASCharacterBase::DoAttack, AttackCooldown, true, FirstDelay);
 }
 
 void ASCharacterBase::EndAttack()
 {
-	GetWorldTimerManager().ClearTimer(Timer_AttackCooldown);
+	GetWorldTimerManager().ClearTimer(TimerHandle_AttackCooldown);
 }
 
 void ASCharacterBase::DoAttack()
 {
+	// PC에서 처리한 입력을 받아 액션 수행하고, 서버에게 호출한다.
+	EAnimMontageType DesiredType = EAnimMontageType::EAMT_NormalAttack_A;
+	switch (ComboCount)
+	{
+	case 0:
+		DesiredType = EAnimMontageType::EAMT_NormalAttack_A;
+		break;
+	case 1:
+		DesiredType = EAnimMontageType::EAMT_NormalAttack_B;
+		break;
+	case 2:
+		DesiredType = EAnimMontageType::EAMT_NormalAttack_C;
+		break;
+	}
 
+	LastAttackTime = GetWorld()->GetTimeSeconds();
+
+	DoSpeicalAction(DesiredType);
+
+	if (Role < ROLE_Authority)
+	{
+		ServerDoSpecialAction(DesiredType);
+	}
 }
 
 void ASCharacterBase::DoJump()
 {
 	Jump();
+
+	ResetComboCount();
+}
+
+void ASCharacterBase::StopJump()
+{
+	StopJumping();
 }
 
 bool ASCharacterBase::ExecuteAbilityOne()
@@ -135,6 +159,11 @@ void ASCharacterBase::SetWeaponCollision(EWeaponCollisionType eType, bool bEnabl
 	{
 		TargetCollComp->SetCollisionEnabled(bEnable ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
 	}
+}
+
+void ASCharacterBase::ResetComboCount()
+{
+	ComboCount = 0;
 }
 
 void ASCharacterBase::OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController)

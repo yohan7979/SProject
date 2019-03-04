@@ -86,7 +86,7 @@ bool USAbilityComponent::CheckManaCost(USkill* TargetSkill)
 	USAttributeComponent* AttributeComp = CachedPawn->GetAttributeComp();
 	if (TargetSkill && AttributeComp)
 	{
-		return AttributeComp->GetCurrentMana() - TargetSkill->GetManaCost() > 0.f;
+		return AttributeComp->GetCurrentMana() - TargetSkill->GetManaCost() >= 0.f;
 	}
 
 	return false;
