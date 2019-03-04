@@ -35,7 +35,7 @@ void USAttributeComponent::ServerSetCurrentMana_Implementation(float InMana)
 
 bool USAttributeComponent::ServerSetCurrentMana_Validate(float InMana)
 {
-	return InMana != 0.f;
+	return InMana >= 0.f;
 }
 
 void USAttributeComponent::AddCurrentMana(float InMana)
