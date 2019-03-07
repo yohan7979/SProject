@@ -139,6 +139,11 @@ bool ASCharacterBase::ExecuteAbilityFour()
 	return false;
 }
 
+void ASCharacterBase::PlayImpactEffect(const FHitResult& HitResult)
+{
+
+}
+
 void ASCharacterBase::SetWeaponCollision(EWeaponCollisionType eType, bool bEnable)
 {
 	UCapsuleComponent* TargetCollComp = nullptr;
@@ -205,6 +210,8 @@ void ASCharacterBase::OnRep_Died()
 		// 콜리젼 off
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		if (LeftWeaponCollComp)		LeftWeaponCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		if (RightWeaponCollComp)	RightWeaponCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
@@ -231,11 +238,6 @@ void ASCharacterBase::MulticastDoSpecialAction_Implementation(EAnimMontageType e
 	}
 }
 
-bool ASCharacterBase::MulticastDoSpecialAction_Validate(EAnimMontageType eType)
-{
-	return true;
-}
-
 void ASCharacterBase::ServerDoSpecialAction_Implementation(EAnimMontageType eType)
 {
 	// 서버에서 액션을 멀티캐스트한다.
@@ -256,6 +258,25 @@ void ASCharacterBase::ServerRequestDealDamage_Implementation(AActor* OtherActor,
 bool ASCharacterBase::ServerRequestDealDamage_Validate(AActor* OtherActor, float BaseDamage)
 {
 	return BaseDamage != 0.f;
+}
+
+void ASCharacterBase::MulticastPlayImpactEffect_Implementation(const FHitResult& HitResult)
+{
+	// 데디 서버는 이펙트 출력할 필요없다.
+	if (GetNetMode() == NM_DedicatedServer)
+		return;
+
+	PlayImpactEffect(HitResult);
+}
+
+void ASCharacterBase::ServerPlayImpactEffect_Implementation(const FHitResult& HitResult)
+{
+	MulticastPlayImpactEffect(HitResult);
+}
+
+bool ASCharacterBase::ServerPlayImpactEffect_Validate(const FHitResult& HitResult)
+{
+	return true;
 }
 
 void ASCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

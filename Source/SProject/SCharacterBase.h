@@ -33,15 +33,21 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRequestDealDamage(AActor* OtherActor, float BaseDamage);
+
+	UFUNCTION(Server, Unreliable, WithValidation)
+	void ServerPlayImpactEffect(const FHitResult& HitResult);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastPlayImpactEffect(const FHitResult& HitResult);
+	virtual void PlayImpactEffect(const FHitResult& HitResult);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerDoSpecialAction(EAnimMontageType eType);
 
-	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	UFUNCTION(NetMulticast, Reliable)
 	void MulticastDoSpecialAction(EAnimMontageType eType);
 	virtual void DoSpeicalAction(EAnimMontageType eType);
 
@@ -73,6 +79,9 @@ public:
 
 	UFUNCTION()
 	void OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController);
+
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere)

@@ -6,6 +6,7 @@
 #include "SCharacterBase.h"
 #include "SCharacterBase_Belica.generated.h"
 
+class UParticleSystem;
 /**
  * 
  */
@@ -26,4 +27,14 @@ public:
 	virtual bool ExecuteAbilityTwo() override;
 	virtual bool ExecuteAbilityThree() override;
 	virtual bool ExecuteAbilityFour() override;
+
+	virtual void PlayImpactEffect(const FHitResult& HitResult) override;
+
+private:
+	UPROPERTY(EditDefaultsOnly)
+	UParticleSystem* PS_HitWorldNormal;
+
+	UPROPERTY(EditDefaultsOnly)
+	UParticleSystem* PS_HitPawnNormal;
+	FName MuzzleSocketName;
 };
