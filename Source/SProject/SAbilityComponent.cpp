@@ -97,7 +97,13 @@ void USAbilityComponent::UpdateProperties(USkill* TargetSkill)
 	USAttributeComponent* AttributeComp = CachedPawn->GetAttributeComp();
 	if (TargetSkill && AttributeComp)
 	{
+		// 쿨다운
 		TargetSkill->SetCooldown(CachedPawn);
+
+		// 마나
 		AttributeComp->AddCurrentMana(-TargetSkill->GetManaCost());
+
+		// 데미지
+		CachedPawn->SetCurrentDamage(TargetSkill->GetDamage());
 	}
 }

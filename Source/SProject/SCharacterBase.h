@@ -76,6 +76,7 @@ public:
 
 	void SetWeaponCollision(EWeaponCollisionType eType, bool bEnable);
 	void ResetComboCount();
+	void SetCurrentDamage(float InDamage);
 
 	UFUNCTION()
 	void OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController);
@@ -126,4 +127,7 @@ protected:
 
 	UPROPERTY(ReplicatedUsing=OnRep_Died, BlueprintReadOnly)
 	bool bDied;
+
+	UPROPERTY(BlueprintReadOnly)
+	float CurrentDamage; // 실제 RPC에 요청할 데미지
 };

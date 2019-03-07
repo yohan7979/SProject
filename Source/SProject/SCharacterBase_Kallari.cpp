@@ -95,7 +95,7 @@ void ASCharacterBase_Kallari::OnLeftCollisionBeginOverlap(UPrimitiveComponent * 
 {
 	if (IsLocallyControlled() && OtherActor != this)
 	{
-		ServerRequestDealDamage(OtherActor, NormalDamage);
+		ServerRequestDealDamage(OtherActor, CurrentDamage);
 		UE_LOG(LogTemp, Warning, TEXT("LeftCollide is occured, RequestServer to DEAL DAMAGE!"));
 	}
 }
@@ -104,7 +104,7 @@ void ASCharacterBase_Kallari::OnRightCollisionBeginOverlap(UPrimitiveComponent *
 {
 	if (IsLocallyControlled() && OtherActor != this)
 	{
-		ServerRequestDealDamage(OtherActor, NormalDamage);
+		ServerRequestDealDamage(OtherActor, CurrentDamage);
 		UE_LOG(LogTemp, Warning, TEXT("RightCollide is occured, RequestServer to DEAL DAMAGE!"));
 	}	
 }

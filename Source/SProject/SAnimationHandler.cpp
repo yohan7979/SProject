@@ -28,4 +28,3 @@ void USAnimationHandler::PlayAnimationMontage(EAnimMontageType eAnimType)
 		CachedCharacter->PlayAnimMontage(*DesireToPlay);
 	}
 }
-

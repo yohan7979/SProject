@@ -78,6 +78,7 @@ void ASCharacterBase::DoAttack()
 	}
 
 	LastAttackTime = GetWorld()->GetTimeSeconds();
+	SetCurrentDamage(NormalDamage);
 
 	DoSpeicalAction(DesiredType);
 
@@ -169,6 +170,11 @@ void ASCharacterBase::SetWeaponCollision(EWeaponCollisionType eType, bool bEnabl
 void ASCharacterBase::ResetComboCount()
 {
 	ComboCount = 0;
+}
+
+void ASCharacterBase::SetCurrentDamage(float InDamage)
+{
+	CurrentDamage = InDamage;
 }
 
 void ASCharacterBase::OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController)
