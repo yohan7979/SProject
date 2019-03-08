@@ -4,11 +4,12 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
+#include "SAnimationHandler.h"
+#include "SAbilityComponent.h"
 #include "SAttributeComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Kismet/GameplayStatics.h"
 #include "SPlayerController.h"
-#include "SAbilityComponent.h"
 #include "Skill.h"
 
 ASCharacterBase::ASCharacterBase()
@@ -78,7 +79,6 @@ void ASCharacterBase::DoAttack()
 	}
 
 	LastAttackTime = GetWorld()->GetTimeSeconds();
-	SetCurrentDamage(NormalDamage);
 
 	DoSpeicalAction(DesiredType);
 
@@ -104,7 +104,7 @@ bool ASCharacterBase::ExecuteAbilityOne()
 {
 	if (AbilityComp != nullptr)
 	{
-		return AbilityComp->ExecuteSkill(EAbilitySlotType::EAST_One);
+		return AbilityComp->ExecuteSkill(ESkillType::EAST_One);
 	}
 
 	return false;
@@ -114,7 +114,7 @@ bool ASCharacterBase::ExecuteAbilityTwo()
 {
 	if (AbilityComp != nullptr)
 	{
-		return AbilityComp->ExecuteSkill(EAbilitySlotType::EAST_Two);
+		return AbilityComp->ExecuteSkill(ESkillType::EAST_Two);
 	}
 
 	return false;
@@ -124,7 +124,7 @@ bool ASCharacterBase::ExecuteAbilityThree()
 {
 	if (AbilityComp != nullptr)
 	{
-		return AbilityComp->ExecuteSkill(EAbilitySlotType::EAST_Three);
+		return AbilityComp->ExecuteSkill(ESkillType::EAST_Three);
 	}
 
 	return false;
@@ -134,7 +134,7 @@ bool ASCharacterBase::ExecuteAbilityFour()
 {
 	if (AbilityComp != nullptr)
 	{
-		return AbilityComp->ExecuteSkill(EAbilitySlotType::EAST_Four);
+		return AbilityComp->ExecuteSkill(ESkillType::EAST_Four);
 	}
 
 	return false;
@@ -172,11 +172,6 @@ void ASCharacterBase::ResetComboCount()
 	ComboCount = 0;
 }
 
-void ASCharacterBase::SetCurrentDamage(float InDamage)
-{
-	CurrentDamage = InDamage;
-}
-
 void ASCharacterBase::OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController)
 {
 	if (CurrentHealth <= 0.f && !bDied)
@@ -187,11 +182,16 @@ void ASCharacterBase::OnHealthChanged(float CurrentHealth, float DamageAmount, A
 	UE_LOG(LogTemp, Warning, TEXT("Causer : %s, Actor: %s, CurrentHealth : %f, Damage : %f"), *DamageCauser->GetName(), *GetName(), CurrentHealth, DamageAmount);
 }
 
-void ASCharacterBase::DoSpeicalAction(EAnimMontageType eType)
+void ASCharacterBase::DoSpeicalAction(EAnimMontageType eAnimType, ESkillType eSkillType)
 {
 	if (AnimationHandler != nullptr)
 	{
-		AnimationHandler->PlayAnimationMontage(eType);
+		AnimationHandler->PlayAnimationMontage(eAnimType);
+	}
+
+	if (AbilityComp != nullptr)
+	{
+		AbilityComp->SetCurrentSkillType(eSkillType);
 	}
 }
 
@@ -235,22 +235,22 @@ bool ASCharacterBase::ServerSetDied_Validate(bool isDie)
 	return true;
 }
 
-void ASCharacterBase::MulticastDoSpecialAction_Implementation(EAnimMontageType eType)
+void ASCharacterBase::MulticastDoSpecialAction_Implementation(EAnimMontageType eAnimType, ESkillType eSkillType)
 {
 	// SimulatedProxy를 대상으로만 수행한다. (데디는 실행할 필요없고, AutonomousProxy는 로컬에서 실행하였음)
 	if (Role == ROLE_SimulatedProxy)
 	{
-		DoSpeicalAction(eType);
+		DoSpeicalAction(eAnimType, eSkillType);
 	}
 }
 
-void ASCharacterBase::ServerDoSpecialAction_Implementation(EAnimMontageType eType)
+void ASCharacterBase::ServerDoSpecialAction_Implementation(EAnimMontageType eAnimType, ESkillType eSkillType)
 {
 	// 서버에서 액션을 멀티캐스트한다.
-	MulticastDoSpecialAction(eType);
+	MulticastDoSpecialAction(eAnimType, eSkillType);
 }
 
-bool ASCharacterBase::ServerDoSpecialAction_Validate(EAnimMontageType eType)
+bool ASCharacterBase::ServerDoSpecialAction_Validate(EAnimMontageType eAnimType, ESkillType eSkillType)
 {
 	return true;
 }

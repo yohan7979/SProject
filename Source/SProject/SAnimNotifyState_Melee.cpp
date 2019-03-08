@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "SAnimNotifyState_Melee.h"
+#include "SCharacterBase.h"
 
 void USAnimNotifyState_Melee::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
 {

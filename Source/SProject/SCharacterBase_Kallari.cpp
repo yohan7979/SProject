@@ -58,10 +58,10 @@ bool ASCharacterBase_Kallari::ExecuteAbilityOne()
 		return false;
 
 	// 캐릭터 구현클래스에서는 해당 캐릭터의 로직을 수행
-	DoSpeicalAction(EAnimMontageType::EAMT_Ability_One);
+	DoSpeicalAction(EAnimMontageType::EAMT_Ability_One, ESkillType::EAST_One);
 	if (Role < ROLE_Authority)
 	{
-		ServerDoSpecialAction(EAnimMontageType::EAMT_Ability_One);
+		ServerDoSpecialAction(EAnimMontageType::EAMT_Ability_One, ESkillType::EAST_One);
 	}
 
 	return true;
@@ -95,7 +95,8 @@ void ASCharacterBase_Kallari::OnLeftCollisionBeginOverlap(UPrimitiveComponent * 
 {
 	if (IsLocallyControlled() && OtherActor != this)
 	{
-		ServerRequestDealDamage(OtherActor, CurrentDamage);
+		float RealDamage = AbilityComp->GetCurrentSkill() ? AbilityComp->GetCurrentSkill()->GetDamage() : NormalDamage;
+		ServerRequestDealDamage(OtherActor, RealDamage);
 		UE_LOG(LogTemp, Warning, TEXT("LeftCollide is occured, RequestServer to DEAL DAMAGE!"));
 	}
 }
@@ -104,7 +105,8 @@ void ASCharacterBase_Kallari::OnRightCollisionBeginOverlap(UPrimitiveComponent *
 {
 	if (IsLocallyControlled() && OtherActor != this)
 	{
-		ServerRequestDealDamage(OtherActor, CurrentDamage);
+		float RealDamage = AbilityComp->GetCurrentSkill() ? AbilityComp->GetCurrentSkill()->GetDamage() : NormalDamage;
+		ServerRequestDealDamage(OtherActor, RealDamage);
 		UE_LOG(LogTemp, Warning, TEXT("RightCollide is occured, RequestServer to DEAL DAMAGE!"));
 	}	
 }

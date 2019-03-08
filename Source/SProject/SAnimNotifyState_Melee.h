@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
-#include "SCharacterBase.h"
+#include "STypes.h"
 #include "SAnimNotifyState_Melee.generated.h"
 
 /**

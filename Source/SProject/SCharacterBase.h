@@ -5,23 +5,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
-#include "SAnimationHandler.h"
+#include "STypes.h"
 #include "SCharacterBase.generated.h"
 
 class UCameraComponent;
 class USpringArmComponent;
 class USAttributeComponent;
+class USAnimationHandler;
 class USAbilityComponent;
-
-
-UENUM()
-enum class EWeaponCollisionType
-{
-	EWCT_None,
-	EWCT_Left,
-	EWCT_Right,
-	EWCT_ETC
-};
 
 UCLASS()
 class SPROJECT_API ASCharacterBase : public ACharacter
@@ -45,11 +36,11 @@ protected:
 	virtual void PlayImpactEffect(const FHitResult& HitResult);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerDoSpecialAction(EAnimMontageType eType);
+	void ServerDoSpecialAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastDoSpecialAction(EAnimMontageType eType);
-	virtual void DoSpeicalAction(EAnimMontageType eType);
+	void MulticastDoSpecialAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None);
+	virtual void DoSpeicalAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSetDied(bool isDie);
@@ -76,7 +67,6 @@ public:
 
 	void SetWeaponCollision(EWeaponCollisionType eType, bool bEnable);
 	void ResetComboCount();
-	void SetCurrentDamage(float InDamage);
 
 	UFUNCTION()
 	void OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController);
@@ -127,7 +117,4 @@ protected:
 
 	UPROPERTY(ReplicatedUsing=OnRep_Died, BlueprintReadOnly)
 	bool bDied;
-
-	UPROPERTY(BlueprintReadOnly)
-	float CurrentDamage; // 실제 RPC에 요청할 데미지
 };

@@ -16,7 +16,7 @@ void USAbilityComponent::BeginPlay()
 
 	for (auto it : SkillSlotClasses)
 	{
-		EAbilitySlotType SkillType = it.Key;
+		ESkillType SkillType = it.Key;
 		if (it.Value != nullptr)
 		{
 			USkill* SkillSlot = it.Value->GetDefaultObject<USkill>();
@@ -26,26 +26,26 @@ void USAbilityComponent::BeginPlay()
 	
 }
 
-void USAbilityComponent::AddSkillSlot(EAbilitySlotType SlotType, USkill* NewSkill)
+void USAbilityComponent::AddSkillSlot(ESkillType SkillType, USkill* NewSkill)
 {
-	RemoveSkillSlot(SlotType);
+	RemoveSkillSlot(SkillType);
 
-	SkillSlots.Add(SlotType, NewSkill);
+	SkillSlots.Add(SkillType, NewSkill);
 }
 
-void USAbilityComponent::RemoveSkillSlot(EAbilitySlotType SlotType)
+void USAbilityComponent::RemoveSkillSlot(ESkillType SkillType)
 {
-	USkill** TargetSkill = SkillSlots.Find(SlotType);
+	USkill** TargetSkill = SkillSlots.Find(SkillType);
 
 	if (TargetSkill)
 	{
-		SkillSlots.Remove(SlotType);
+		SkillSlots.Remove(SkillType);
 	}
 }
 
-bool USAbilityComponent::ExecuteSkill(EAbilitySlotType SlotType)
+bool USAbilityComponent::ExecuteSkill(ESkillType SkillType)
 {
-	USkill** TargetSkill = SkillSlots.Find(SlotType);
+	USkill** TargetSkill = SkillSlots.Find(SkillType);
 	if (TargetSkill && CachedPawn)
 	{
 		if (CheckConditions(*TargetSkill) == true)
@@ -102,8 +102,16 @@ void USAbilityComponent::UpdateProperties(USkill* TargetSkill)
 
 		// 마나
 		AttributeComp->AddCurrentMana(-TargetSkill->GetManaCost());
-
-		// 데미지
-		CachedPawn->SetCurrentDamage(TargetSkill->GetDamage());
 	}
+}
+
+const USkill* USAbilityComponent::GetCurrentSkill()
+{
+	USkill** TargetSkill = SkillSlots.Find(CurrentSkillType);
+	if (TargetSkill != nullptr)
+	{
+		return *TargetSkill;
+	}
+
+	return nullptr;
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "STypes.h"
 #include "SAbilityComponent.generated.h"
 
 /** 
@@ -11,15 +12,6 @@
 	스킬 컴포넌트를 관리하는 컨테이너를 가진다.
 	캐릭터는 이 컴포넌트를 통해 등록된 스킬을 발동시킬 수 있다.
 **/
-UENUM()
-enum class EAbilitySlotType
-{
-	EAST_None,
-	EAST_One,
-	EAST_Two,
-	EAST_Three,
-	EAST_Four
-};
 
 class USkill;
 class ASCharacterBase;
@@ -36,23 +28,28 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void AddSkillSlot(EAbilitySlotType SlotType, USkill* NewSkill);
-	void RemoveSkillSlot(EAbilitySlotType SlotType);
+	void AddSkillSlot(ESkillType SlotType, USkill* NewSkill);
+	void RemoveSkillSlot(ESkillType SlotType);
 
-	bool ExecuteSkill(EAbilitySlotType SlotType);
+	bool ExecuteSkill(ESkillType SlotType);
 
 	bool CheckConditions(USkill* TargetSkill);
 	bool CheckCooldown(USkill* TargetSkill);
 	bool CheckManaCost(USkill* TargetSkill);
 
 	void UpdateProperties(USkill* TargetSkill);
+	
+	const USkill* GetCurrentSkill();
+	ESkillType GetCurrentSkillType() const { return CurrentSkillType; }
+	void SetCurrentSkillType(ESkillType eSkillType) { CurrentSkillType = eSkillType; }
 
 public:	
 	UPROPERTY(EditDefaultsOnly)
-	TMap<EAbilitySlotType, TSubclassOf<USkill>> SkillSlotClasses;
+	TMap<ESkillType, TSubclassOf<USkill>> SkillSlotClasses;
 	UPROPERTY() // Reflection
-	TMap<EAbilitySlotType, USkill*> SkillSlots;
+	TMap<ESkillType, USkill*> SkillSlots;
 
 private:
 	ASCharacterBase* CachedPawn;
+	ESkillType CurrentSkillType;
 };
