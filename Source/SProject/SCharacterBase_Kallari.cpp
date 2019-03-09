@@ -6,14 +6,16 @@
 #include "Skill.h"
 #include "SAnimationHandler.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 
 ASCharacterBase_Kallari::ASCharacterBase_Kallari()
 {
-	LeftWeaponCollComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("LeftWeaponCollComp"));
-	LeftWeaponCollComp->SetupAttachment(GetMesh(), "WeaponAttachPointL");
+	MeleeCollComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("MeleeCollComp"));
+	MeleeCollComp->SetupAttachment(RootComponent);
 
-	RightWeaponCollComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RightWeaponCollComp"));
-	RightWeaponCollComp->SetupAttachment(GetMesh(), "WeaponAttachPointR");
+	RoundCollComp = CreateDefaultSubobject<USphereComponent>(TEXT("RoundCollComp"));
+	RoundCollComp->SetupAttachment(RootComponent);
 
 	AttackCooldown = 1.f;
 	ComboCountKeepingTime = 1.5f;
@@ -25,11 +27,11 @@ void ASCharacterBase_Kallari::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (LeftWeaponCollComp != nullptr)
-		LeftWeaponCollComp->OnComponentBeginOverlap.AddDynamic(this, &ASCharacterBase_Kallari::OnLeftCollisionBeginOverlap);
+	if (MeleeCollComp != nullptr)
+		MeleeCollComp->OnComponentBeginOverlap.AddDynamic(this, &ASCharacterBase_Kallari::OnMeleeCollisionBeginOverlap);
 
-	if (RightWeaponCollComp != nullptr)
-		RightWeaponCollComp->OnComponentBeginOverlap.AddDynamic(this, &ASCharacterBase_Kallari::OnRightCollisionBeginOverlap);
+	if (RoundCollComp != nullptr)
+		RoundCollComp->OnComponentBeginOverlap.AddDynamic(this, &ASCharacterBase_Kallari::OnRoundCollisionBeginOverlap);
 }
 
 void ASCharacterBase_Kallari::DoAttack()
@@ -91,22 +93,22 @@ bool ASCharacterBase_Kallari::ExecuteAbilityFour()
 	return true;
 }
 
-void ASCharacterBase_Kallari::OnLeftCollisionBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+void ASCharacterBase_Kallari::OnMeleeCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 	if (IsLocallyControlled() && OtherActor != this)
 	{
 		float RealDamage = AbilityComp->GetCurrentSkill() ? AbilityComp->GetCurrentSkill()->GetDamage() : NormalDamage;
 		ServerRequestDealDamage(OtherActor, RealDamage);
-		UE_LOG(LogTemp, Warning, TEXT("LeftCollide is occured, RequestServer to DEAL DAMAGE!"));
+		UE_LOG(LogTemp, Warning, TEXT("MeleeCollide is occured, RequestServer to DEAL DAMAGE!"));
 	}
 }
 
-void ASCharacterBase_Kallari::OnRightCollisionBeginOverlap(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+void ASCharacterBase_Kallari::OnRoundCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 	if (IsLocallyControlled() && OtherActor != this)
 	{
 		float RealDamage = AbilityComp->GetCurrentSkill() ? AbilityComp->GetCurrentSkill()->GetDamage() : NormalDamage;
 		ServerRequestDealDamage(OtherActor, RealDamage);
-		UE_LOG(LogTemp, Warning, TEXT("RightCollide is occured, RequestServer to DEAL DAMAGE!"));
-	}	
+		UE_LOG(LogTemp, Warning, TEXT("RoundCollide is occured, RequestServer to DEAL DAMAGE!"));
+	}
 }

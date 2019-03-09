@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Components/CapsuleComponent.h"
 #include "STypes.h"
 #include "SCharacterBase.generated.h"
 
@@ -13,6 +12,8 @@ class USpringArmComponent;
 class USAttributeComponent;
 class USAnimationHandler;
 class USAbilityComponent;
+class USphereComponent;
+class UCapsuleComponent;
 
 UCLASS()
 class SPROJECT_API ASCharacterBase : public ACharacter
@@ -85,10 +86,10 @@ protected:
 	USAnimationHandler*		AnimationHandler;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	UCapsuleComponent*		LeftWeaponCollComp;
+	UCapsuleComponent*		MeleeCollComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	UCapsuleComponent*		RightWeaponCollComp;
+	USphereComponent*		RoundCollComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	USAttributeComponent*	AttributeComp;

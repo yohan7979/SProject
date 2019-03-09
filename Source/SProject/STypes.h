@@ -26,7 +26,7 @@ UENUM()
 enum class EWeaponCollisionType : uint8
 {
 	EWCT_None,
-	EWCT_Left,
-	EWCT_Right,
+	EWCT_Melee,
+	EWCT_Round,
 	EWCT_ETC
 };

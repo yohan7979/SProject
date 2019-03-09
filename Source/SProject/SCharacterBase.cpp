@@ -3,6 +3,8 @@
 #include "SCharacterBase.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 #include "Camera/CameraComponent.h"
 #include "SAnimationHandler.h"
 #include "SAbilityComponent.h"
@@ -147,15 +149,15 @@ void ASCharacterBase::PlayImpactEffect(const FHitResult& HitResult)
 
 void ASCharacterBase::SetWeaponCollision(EWeaponCollisionType eType, bool bEnable)
 {
-	UCapsuleComponent* TargetCollComp = nullptr;
+	UPrimitiveComponent* TargetCollComp = nullptr;
 
 	switch (eType)
 	{
-	case EWeaponCollisionType::EWCT_Left:
-		TargetCollComp = LeftWeaponCollComp;
+	case EWeaponCollisionType::EWCT_Melee:
+		TargetCollComp = MeleeCollComp;
 		break;
-	case EWeaponCollisionType::EWCT_Right:
-		TargetCollComp = RightWeaponCollComp;
+	case EWeaponCollisionType::EWCT_Round:
+		TargetCollComp = RoundCollComp;
 		break;
 	default:;
 		return;
@@ -218,8 +220,8 @@ void ASCharacterBase::OnRep_Died()
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
 		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		if (LeftWeaponCollComp)		LeftWeaponCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		if (RightWeaponCollComp)	RightWeaponCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		if (MeleeCollComp)			MeleeCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		if (RoundCollComp)			RoundCollComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
