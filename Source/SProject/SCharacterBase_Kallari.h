@@ -23,10 +23,10 @@ protected:
 
 public:
 	virtual void DoAttack() override;
-	virtual bool ExecuteAbilityOne() override;
-	virtual bool ExecuteAbilityTwo() override;
-	virtual bool ExecuteAbilityThree() override;
-	virtual bool ExecuteAbilityFour() override;
+	virtual bool ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSkillType) override;
+	virtual void NotifiedSkillFinished(ESkillType SkillType) override;
+
+	void ThrowDagger();
 
 	UFUNCTION()
 	void OnMeleeCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,

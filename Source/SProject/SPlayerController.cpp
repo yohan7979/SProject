@@ -3,6 +3,7 @@
 #include "SPlayerController.h"
 #include "SCharacterBase.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "STypes.h"
 
 void ASPlayerController::BeginPlay()
 {
@@ -23,6 +24,7 @@ void ASPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Attack", IE_Pressed, this, &ASPlayerController::BeginAttack);
 	InputComponent->BindAction("Attack", IE_Released, this, &ASPlayerController::EndAttack);
 	InputComponent->BindAction("AbilityOne", IE_Pressed, this, &ASPlayerController::AbilityOne);
+	InputComponent->BindAction("AbilityTwo", IE_Pressed, this, &ASPlayerController::AbilityTwo);
 
 	InputComponent->BindAction<FJumpInputDelegate>("Jump", IE_Pressed, this, &ASPlayerController::Jump, true);
 	InputComponent->BindAction<FJumpInputDelegate>("Jump", IE_Released, this, &ASPlayerController::Jump, false);
@@ -100,7 +102,7 @@ void ASPlayerController::AbilityOne()
 {
 	if (CachedCharacter != nullptr)
 	{
-		CachedCharacter->ExecuteAbilityOne();
+		CachedCharacter->ExecuteAbility(EAnimMontageType::EAMT_Ability_One, ESkillType::EAST_One);
 	}
 }
 
@@ -108,7 +110,7 @@ void ASPlayerController::AbilityTwo()
 {
 	if (CachedCharacter != nullptr)
 	{
-		CachedCharacter->ExecuteAbilityTwo();
+		CachedCharacter->ExecuteAbility(EAnimMontageType::EAMT_Ability_Two, ESkillType::EAST_Two);
 	}
 }
 
@@ -116,7 +118,7 @@ void ASPlayerController::AbilityThree()
 {
 	if (CachedCharacter != nullptr)
 	{
-		CachedCharacter->ExecuteAbilityThree();
+		CachedCharacter->ExecuteAbility(EAnimMontageType::EAMT_Ability_Three, ESkillType::EAST_Three);
 	}
 }
 
@@ -124,7 +126,7 @@ void ASPlayerController::AbliityFour()
 {
 	if (CachedCharacter != nullptr)
 	{
-		CachedCharacter->ExecuteAbilityFour();
+		CachedCharacter->ExecuteAbility(EAnimMontageType::EAMT_Ability_Four, ESkillType::EAST_Four);
 	}
 }
 

@@ -22,7 +22,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	void PlayAnimationMontage(EAnimMontageType eAnimType);
+	void PlayAnimationMontage(EAnimMontageType eAnimType, FName SectionName = NAME_None);
+	void StopAnimationMontage(EAnimMontageType eAnimType);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category="AnimMontage")

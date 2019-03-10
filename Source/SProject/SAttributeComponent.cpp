@@ -9,14 +9,15 @@
 USAttributeComponent::USAttributeComponent() : MaxHelth(200.f), MaxMana(100.f)
 {
 	SetIsReplicated(true);
-	CurrentHealth = MaxHelth;
-	CurrentMana = MaxMana;
 }
 
 
 void USAttributeComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	CurrentHealth = MaxHelth;
+	CurrentMana = MaxMana;
 
 	if (GetOwnerRole() == ROLE_Authority)
 	{

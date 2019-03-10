@@ -14,6 +14,7 @@ class USAnimationHandler;
 class USAbilityComponent;
 class USphereComponent;
 class UCapsuleComponent;
+class USkill;
 
 UCLASS()
 class SPROJECT_API ASCharacterBase : public ACharacter
@@ -37,11 +38,11 @@ protected:
 	virtual void PlayImpactEffect(const FHitResult& HitResult);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerDoSpecialAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None);
+	void ServerDoSpecialAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None, FName SectionName = NAME_None, bool bPlay = true);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastDoSpecialAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None);
-	virtual void DoSpeicalAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None);
+	void MulticastDoSpecialAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None, FName SectionName = NAME_None, bool bPlay = true);
+	virtual void DoSpeicalAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None, FName SectionName = NAME_None, bool bPlay=true);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSetDied(bool isDie);
@@ -61,13 +62,13 @@ public:
 	virtual void DoJump();
 	virtual void StopJump();
 
-	virtual bool ExecuteAbilityOne();
-	virtual bool ExecuteAbilityTwo();
-	virtual bool ExecuteAbilityThree();
-	virtual bool ExecuteAbilityFour();
+	virtual bool ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSkillType);
 
 	void SetWeaponCollision(EWeaponCollisionType eType, bool bEnable);
+	void GetAnimMontageByComboCount(EAnimMontageType& eAnimType, ESkillType& eSkillType);
+	void CalculateComboCount();
 	void ResetComboCount();
+	virtual void NotifiedSkillFinished(ESkillType SkillType);
 
 	UFUNCTION()
 	void OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController);

@@ -23,18 +23,7 @@ protected:
 
 public:
 	virtual void DoAttack() override;
-	virtual bool ExecuteAbilityOne() override;
-	virtual bool ExecuteAbilityTwo() override;
-	virtual bool ExecuteAbilityThree() override;
-	virtual bool ExecuteAbilityFour() override;
-
-	virtual void PlayImpactEffect(const FHitResult& HitResult) override;
 
 private:
-	UPROPERTY(EditDefaultsOnly)
-	UParticleSystem* PS_HitWorldNormal;
-
-	UPROPERTY(EditDefaultsOnly)
-	UParticleSystem* PS_HitPawnNormal;
 	FName MuzzleSocketName;
 };

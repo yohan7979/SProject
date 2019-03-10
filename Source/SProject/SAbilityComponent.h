@@ -28,19 +28,20 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void AddSkillSlot(ESkillType SlotType, USkill* NewSkill);
-	void RemoveSkillSlot(ESkillType SlotType);
+	void AddSkillSlot(ESkillType SkillType, USkill* NewSkill);
+	void RemoveSkillSlot(ESkillType SkillType);
 
-	bool ExecuteSkill(ESkillType SlotType);
+	bool ExecuteSkill(ESkillType SkillType);
 
 	bool CheckConditions(USkill* TargetSkill);
 	bool CheckCooldown(USkill* TargetSkill);
 	bool CheckManaCost(USkill* TargetSkill);
+	bool CheckCanActivate();
+	bool IsSkillActivated(ESkillType SkillType);
 
-	void UpdateProperties(USkill* TargetSkill);
+	void SetSkillCost(USkill* TargetSkill);
 	
-	const USkill* GetCurrentSkill();
-	ESkillType GetCurrentSkillType() const { return CurrentSkillType; }
+	USkill* GetCurrentSkill();
 	void SetCurrentSkillType(ESkillType eSkillType) { CurrentSkillType = eSkillType; }
 
 public:	

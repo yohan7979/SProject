@@ -65,36 +65,26 @@ void ASCharacterBase::EndAttack()
 
 void ASCharacterBase::DoAttack()
 {
-	// PC에서 처리한 입력을 받아 액션 수행하고, 서버에게 호출한다.
-	EAnimMontageType DesiredType = EAnimMontageType::EAMT_NormalAttack_A;
-	switch (ComboCount)
+	EAnimMontageType AnimType;
+	ESkillType SkillType;
+
+	GetAnimMontageByComboCount(AnimType, SkillType);
+
+	if (AbilityComp && AbilityComp->ExecuteSkill(SkillType))
 	{
-	case 0:
-		DesiredType = EAnimMontageType::EAMT_NormalAttack_A;
-		break;
-	case 1:
-		DesiredType = EAnimMontageType::EAMT_NormalAttack_B;
-		break;
-	case 2:
-		DesiredType = EAnimMontageType::EAMT_NormalAttack_C;
-		break;
-	}
+		DoSpeicalAction(AnimType, SkillType);
+		if (Role < ROLE_Authority)
+		{
+			ServerDoSpecialAction(AnimType, SkillType);
+		}
 
-	LastAttackTime = GetWorld()->GetTimeSeconds();
-
-	DoSpeicalAction(DesiredType);
-
-	if (Role < ROLE_Authority)
-	{
-		ServerDoSpecialAction(DesiredType);
+		LastAttackTime = GetWorld()->GetTimeSeconds();
 	}
 }
 
 void ASCharacterBase::DoJump()
 {
 	Jump();
-
-	ResetComboCount();
 }
 
 void ASCharacterBase::StopJump()
@@ -102,41 +92,18 @@ void ASCharacterBase::StopJump()
 	StopJumping();
 }
 
-bool ASCharacterBase::ExecuteAbilityOne()
+bool ASCharacterBase::ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSkillType)
 {
-	if (AbilityComp != nullptr)
+	// 발동할 수 있는 지 검사
+	if (AbilityComp && AbilityComp->ExecuteSkill(eSkillType))
 	{
-		return AbilityComp->ExecuteSkill(ESkillType::EAST_One);
-	}
-
-	return false;
-}
-
-bool ASCharacterBase::ExecuteAbilityTwo()
-{
-	if (AbilityComp != nullptr)
-	{
-		return AbilityComp->ExecuteSkill(ESkillType::EAST_Two);
-	}
-
-	return false;
-}
-
-bool ASCharacterBase::ExecuteAbilityThree()
-{
-	if (AbilityComp != nullptr)
-	{
-		return AbilityComp->ExecuteSkill(ESkillType::EAST_Three);
-	}
-
-	return false;
-}
-
-bool ASCharacterBase::ExecuteAbilityFour()
-{
-	if (AbilityComp != nullptr)
-	{
-		return AbilityComp->ExecuteSkill(ESkillType::EAST_Four);
+		// 애니메이션 처리
+		DoSpeicalAction(eAnimType, eSkillType);
+		if (Role < ROLE_Authority)
+		{
+			ServerDoSpecialAction(eAnimType, eSkillType);
+		}
+		return true;
 	}
 
 	return false;
@@ -144,7 +111,25 @@ bool ASCharacterBase::ExecuteAbilityFour()
 
 void ASCharacterBase::PlayImpactEffect(const FHitResult& HitResult)
 {
+	const USkill* TargetSkill = AbilityComp->GetCurrentSkill();
+	AActor* HitActor = HitResult.GetActor();
+	if (TargetSkill && HitActor)
+	{
+		UParticleSystem* ParticleToPlay;
+		if (Cast<ASCharacterBase>(HitActor) != nullptr)
+		{
+			ParticleToPlay = TargetSkill->GetParticleSystemPawn();
+		}
+		else
+		{
+			ParticleToPlay = TargetSkill->GetParticleSystemWorld();
+		}
 
+		if (ParticleToPlay != nullptr)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleToPlay, HitResult.ImpactPoint, HitResult.ImpactNormal.Rotation());
+		}
+	}
 }
 
 void ASCharacterBase::SetWeaponCollision(EWeaponCollisionType eType, bool bEnable)
@@ -169,9 +154,71 @@ void ASCharacterBase::SetWeaponCollision(EWeaponCollisionType eType, bool bEnabl
 	}
 }
 
+void ASCharacterBase::GetAnimMontageByComboCount(EAnimMontageType& eAnimType, ESkillType& eSkillType)
+{
+	// PC에서 처리한 입력을 받아 액션 수행하고, 서버에게 호출한다.
+	EAnimMontageType DesiredAnim;
+	ESkillType DesiredSkill;
+
+	if (GetCharacterMovement()->IsFalling() && GetVelocity().Z >= 0.f)
+	{
+		DesiredAnim = EAnimMontageType::EAMT_JumpAttack;
+		DesiredSkill = ESkillType::EAST_Basic_A;
+		ResetComboCount();
+	}
+	else
+	{
+		switch (ComboCount)
+		{
+		case 0:
+			DesiredAnim = EAnimMontageType::EAMT_NormalAttack_A;
+			DesiredSkill = ESkillType::EAST_Basic_A;
+			break;
+		case 1:
+			DesiredAnim = EAnimMontageType::EAMT_NormalAttack_B;
+			DesiredSkill = ESkillType::EAST_Basic_B;
+			break;
+		case 2:
+			DesiredAnim = EAnimMontageType::EAMT_NormalAttack_C;
+			DesiredSkill = ESkillType::EAST_Basic_C;
+			break;
+		default:
+			DesiredAnim = EAnimMontageType::EAMT_NormalAttack_A;
+			DesiredSkill = ESkillType::EAST_Basic_A;
+			break;
+		}
+
+		CalculateComboCount();
+	}
+
+	eAnimType = DesiredAnim;
+	eSkillType = DesiredSkill;
+}
+
+void ASCharacterBase::CalculateComboCount()
+{
+	// 로컬 클라이언트에서 쿨타임, 콤보 카운팅 계산
+	if (bRandomCombo)
+	{
+		ComboCount = FMath::Rand() % MaxComboCount;
+	}
+	else
+	{
+		ComboCount < MaxComboCount - 1 ? ++ComboCount : ComboCount = 0;
+	}
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_Combo);
+	GetWorldTimerManager().SetTimer(TimerHandle_Combo, this, &ASCharacterBase::ResetComboCount, ComboCountKeepingTime, false);
+}
+
 void ASCharacterBase::ResetComboCount()
 {
 	ComboCount = 0;
+}
+
+void ASCharacterBase::NotifiedSkillFinished(ESkillType SkillType)
+{
+	UE_LOG(LogTemp, Log, TEXT("Skill is Finished."));
 }
 
 void ASCharacterBase::OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController)
@@ -184,16 +231,23 @@ void ASCharacterBase::OnHealthChanged(float CurrentHealth, float DamageAmount, A
 	UE_LOG(LogTemp, Warning, TEXT("Causer : %s, Actor: %s, CurrentHealth : %f, Damage : %f"), *DamageCauser->GetName(), *GetName(), CurrentHealth, DamageAmount);
 }
 
-void ASCharacterBase::DoSpeicalAction(EAnimMontageType eAnimType, ESkillType eSkillType)
+void ASCharacterBase::DoSpeicalAction(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName, bool bPlay)
 {
 	if (AnimationHandler != nullptr)
 	{
-		AnimationHandler->PlayAnimationMontage(eAnimType);
+		if (bPlay)
+		{
+			AnimationHandler->PlayAnimationMontage(eAnimType, SectionName);
+		}
+		else
+		{
+			AnimationHandler->StopAnimationMontage(eAnimType);
+		}
 	}
 
 	if (AbilityComp != nullptr)
 	{
-		AbilityComp->SetCurrentSkillType(eSkillType);
+		AbilityComp->SetCurrentSkillType(bPlay ? eSkillType : ESkillType::EAST_None);
 	}
 }
 
@@ -237,22 +291,22 @@ bool ASCharacterBase::ServerSetDied_Validate(bool isDie)
 	return true;
 }
 
-void ASCharacterBase::MulticastDoSpecialAction_Implementation(EAnimMontageType eAnimType, ESkillType eSkillType)
+void ASCharacterBase::MulticastDoSpecialAction_Implementation(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName, bool bPlay)
 {
 	// SimulatedProxy를 대상으로만 수행한다. (데디는 실행할 필요없고, AutonomousProxy는 로컬에서 실행하였음)
 	if (Role == ROLE_SimulatedProxy)
 	{
-		DoSpeicalAction(eAnimType, eSkillType);
+		DoSpeicalAction(eAnimType, eSkillType, SectionName, bPlay);
 	}
 }
 
-void ASCharacterBase::ServerDoSpecialAction_Implementation(EAnimMontageType eAnimType, ESkillType eSkillType)
+void ASCharacterBase::ServerDoSpecialAction_Implementation(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName, bool bPlay)
 {
 	// 서버에서 액션을 멀티캐스트한다.
-	MulticastDoSpecialAction(eAnimType, eSkillType);
+	MulticastDoSpecialAction(eAnimType, eSkillType, SectionName, bPlay);
 }
 
-bool ASCharacterBase::ServerDoSpecialAction_Validate(EAnimMontageType eAnimType, ESkillType eSkillType)
+bool ASCharacterBase::ServerDoSpecialAction_Validate(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName, bool bPlay)
 {
 	return true;
 }

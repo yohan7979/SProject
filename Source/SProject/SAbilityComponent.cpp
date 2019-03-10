@@ -21,6 +21,7 @@ void USAbilityComponent::BeginPlay()
 		{
 			USkill* SkillSlot = it.Value->GetDefaultObject<USkill>();
 			AddSkillSlot(SkillType, SkillSlot);
+			SkillSlot->SetThisSkillType(SkillType);
 		}
 	}
 	
@@ -51,7 +52,7 @@ bool USAbilityComponent::ExecuteSkill(ESkillType SkillType)
 		if (CheckConditions(*TargetSkill) == true)
 		{
 			// 발동 조건 성립시, 코스트 계산 수행
-			UpdateProperties(*TargetSkill);
+			SetSkillCost(*TargetSkill);
 			return true;
 		}
 	}
@@ -66,6 +67,10 @@ bool USAbilityComponent::CheckConditions(USkill* TargetSkill)
 
 	// 마나 코스트 검사
 	if (!CheckManaCost(TargetSkill))
+		return false;
+
+	// 타 스킬 발동 중인지 검사
+	if (!CheckCanActivate())
 		return false;
 
 	return true;
@@ -92,7 +97,37 @@ bool USAbilityComponent::CheckManaCost(USkill* TargetSkill)
 	return false;
 }
 
-void USAbilityComponent::UpdateProperties(USkill* TargetSkill)
+bool USAbilityComponent::CheckCanActivate()
+{
+	for (auto it : SkillSlots)
+	{
+		// 다른 스킬이 발동 중이면 캔슬하지 못한다.
+		if (IsSkillActivated(it.Key))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool USAbilityComponent::IsSkillActivated(ESkillType SkillType)
+{
+	if (SkillType == CurrentSkillType)
+	{
+		USkill* TargetSkill = GetCurrentSkill();
+		if (TargetSkill != nullptr && CachedPawn)
+		{
+			if (TargetSkill->IsActivated(CachedPawn))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+void USAbilityComponent::SetSkillCost(USkill* TargetSkill)
 {
 	USAttributeComponent* AttributeComp = CachedPawn->GetAttributeComp();
 	if (TargetSkill && AttributeComp)
@@ -102,10 +137,13 @@ void USAbilityComponent::UpdateProperties(USkill* TargetSkill)
 
 		// 마나
 		AttributeComp->AddCurrentMana(-TargetSkill->GetManaCost());
+
+		// 스킬 지속 시간
+		TargetSkill->SetActivate(CachedPawn);
 	}
 }
 
-const USkill* USAbilityComponent::GetCurrentSkill()
+USkill* USAbilityComponent::GetCurrentSkill()
 {
 	USkill** TargetSkill = SkillSlots.Find(CurrentSkillType);
 	if (TargetSkill != nullptr)

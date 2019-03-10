@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "Particles/ParticleSystem.h"
 
 ASCharacterBase_Kallari::ASCharacterBase_Kallari()
 {
@@ -36,69 +37,63 @@ void ASCharacterBase_Kallari::BeginPlay()
 
 void ASCharacterBase_Kallari::DoAttack()
 {
-	Super::DoAttack();
-
-	// 로컬 클라이언트에서 쿨타임, 콤보 카운팅 계산
-	if (bRandomCombo)
+	if (AbilityComp && AbilityComp->IsSkillActivated(ESkillType::EAST_Two))
 	{
-		ComboCount = FMath::Rand() % MaxComboCount;
+		AbilityComp->GetCurrentSkill()->ClearActivate(this);
+		ThrowDagger();
 	}
 	else
 	{
-		ComboCount < MaxComboCount - 1 ? ++ComboCount : ComboCount = 0;
+		Super::DoAttack();
 	}
-
-	GetWorldTimerManager().ClearTimer(TimerHandle_Combo);
-	GetWorldTimerManager().SetTimer(TimerHandle_Combo, this, &ASCharacterBase::ResetComboCount, ComboCountKeepingTime, false);
 }
 
-bool ASCharacterBase_Kallari::ExecuteAbilityOne()
+bool ASCharacterBase_Kallari::ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSkillType)
 {
-	// 상위 클래스에서는 AbilityComp에게 해당 Skill을 Execute하도록 명령해줌.
-	// 여기서 조건 검사하고 계산 처리를 수행해준다. (코스트, 쿨다운 등)
-	if (!Super::ExecuteAbilityOne())
-		return false;
+	return Super::ExecuteAbility(eAnimType, eSkillType);
+}
 
-	// 캐릭터 구현클래스에서는 해당 캐릭터의 로직을 수행
-	DoSpeicalAction(EAnimMontageType::EAMT_Ability_One, ESkillType::EAST_One);
+void ASCharacterBase_Kallari::NotifiedSkillFinished(ESkillType SkillType)
+{
+	Super::NotifiedSkillFinished(SkillType);
+
+	switch (SkillType)
+	{
+	case ESkillType::EAST_Two:
+		DoSpeicalAction(EAnimMontageType::EAMT_CancelMotion);
+		if (Role < ROLE_Authority)
+		{
+			ServerDoSpecialAction(EAnimMontageType::EAMT_CancelMotion);
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void ASCharacterBase_Kallari::ThrowDagger()
+{
+	// 애니메이션
+	DoSpeicalAction(EAnimMontageType::EAMT_Ability_Two, ESkillType::EAST_Two, "End");
 	if (Role < ROLE_Authority)
 	{
-		ServerDoSpecialAction(EAnimMontageType::EAMT_Ability_One, ESkillType::EAST_One);
+		ServerDoSpecialAction(EAnimMontageType::EAMT_Ability_Two, ESkillType::EAST_Two, "End");
 	}
 
-	return true;
-}
-
-bool ASCharacterBase_Kallari::ExecuteAbilityTwo()
-{
-	if (!Super::ExecuteAbilityTwo())
-		return false;
-
-	return true;
-}
-
-bool ASCharacterBase_Kallari::ExecuteAbilityThree()
-{
-	if (!Super::ExecuteAbilityThree())
-		return false;
-
-	return true;
-}
-
-bool ASCharacterBase_Kallari::ExecuteAbilityFour()
-{
-	if (!Super::ExecuteAbilityFour())
-		return false;
-
-	return true;
+	// 프로젝타일
 }
 
 void ASCharacterBase_Kallari::OnMeleeCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 	if (IsLocallyControlled() && OtherActor != this)
 	{
-		float RealDamage = AbilityComp->GetCurrentSkill() ? AbilityComp->GetCurrentSkill()->GetDamage() : NormalDamage;
+		const USkill* TargetSkill = AbilityComp->GetCurrentSkill();
+		float RealDamage = TargetSkill ? TargetSkill->GetDamage() : NormalDamage;
+
 		ServerRequestDealDamage(OtherActor, RealDamage);
+
+		FHitResult HitResult(OtherActor, OtherComp, OtherActor->GetActorLocation(), (GetActorLocation() - OtherActor->GetActorLocation()).GetSafeNormal());
+		ServerPlayImpactEffect(HitResult);
 		UE_LOG(LogTemp, Warning, TEXT("MeleeCollide is occured, RequestServer to DEAL DAMAGE!"));
 	}
 }
@@ -107,8 +102,13 @@ void ASCharacterBase_Kallari::OnRoundCollisionBeginOverlap(UPrimitiveComponent* 
 {
 	if (IsLocallyControlled() && OtherActor != this)
 	{
-		float RealDamage = AbilityComp->GetCurrentSkill() ? AbilityComp->GetCurrentSkill()->GetDamage() : NormalDamage;
+		const USkill* TargetSkill = AbilityComp->GetCurrentSkill();
+		float RealDamage = TargetSkill ? TargetSkill->GetDamage() : NormalDamage;
+
 		ServerRequestDealDamage(OtherActor, RealDamage);
+
+		FHitResult HitResult(OtherActor, OtherComp, OtherActor->GetActorLocation(), (GetActorLocation() - OtherActor->GetActorLocation()).GetSafeNormal());
+		ServerPlayImpactEffect(HitResult);
 		UE_LOG(LogTemp, Warning, TEXT("RoundCollide is occured, RequestServer to DEAL DAMAGE!"));
 	}
 }
