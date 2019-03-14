@@ -38,7 +38,7 @@ void ASProjectile::BeginPlay()
 	// 충돌처리는 Server, Client 모두 수행한다. (Simulation을 위해)
 	SphereComp->OnComponentHit.AddDynamic(this, &ASProjectile::OnHit);
 	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ASProjectile::OnOverlapped);
-	MulticastPlayEffect(SpawnPS);
+	PlayEffect(SpawnPS);
 }
 
 // Called every frame
@@ -48,13 +48,26 @@ void ASProjectile::Tick(float DeltaTime)
 
 }
 
+void ASProjectile::SetLifeSpan(float InLifespan)
+{
+	if (HitNonePS != nullptr)
+	{
+		PlayEffect(HitNonePS);
+	}
+	
+	Super::SetLifeSpan(InLifespan);
+}
+
 void ASProjectile::SetProjectileDirection(const FVector& Direction)
 {
 	ProjectileMovementComp->Velocity = Direction * ProjectileMovementComp->InitialSpeed;
 }
 
-void ASProjectile::MulticastPlayEffect_Implementation(UParticleSystem* TargetPS)
+void ASProjectile::PlayEffect(UParticleSystem* TargetPS)
 {
+	if (GetNetMode() == NM_DedicatedServer)
+		return;
+
 	if (TargetPS != nullptr)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TargetPS, GetTransform());
@@ -65,7 +78,7 @@ void ASProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 {
 	if (HitWorldPS != nullptr)
 	{
-		MulticastPlayEffect(HitWorldPS);
+		PlayEffect(HitWorldPS);
 	}
 	
 	Destroy();
@@ -86,7 +99,7 @@ void ASProjectile::OnOverlapped(UPrimitiveComponent* OverlappedComponent, AActor
 		
 		if (HitPawnPS != nullptr)
 		{
-			MulticastPlayEffect(HitPawnPS);
+			PlayEffect(HitPawnPS);
 		}
 
 		Destroy();

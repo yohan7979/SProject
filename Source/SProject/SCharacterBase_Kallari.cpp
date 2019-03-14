@@ -95,7 +95,10 @@ bool ASCharacterBase_Kallari::ServerCreateDagger_Validate()
 
 void ASCharacterBase_Kallari::ThrowDagger()
 {
-	// 프로젝타일 @TODO: Net Sync
+	if (Role != ROLE_Authority)
+		return;
+
+	// 프로젝타일 - Spawn On Server
 	FVector StartTrace = GetPawnViewLocation();
 	FVector AimDir = GetControlRotation().Vector();
 	FVector EndTrace = StartTrace + AimDir * 10000.f;

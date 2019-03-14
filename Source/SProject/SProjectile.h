@@ -24,12 +24,11 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
+	virtual void SetLifeSpan(float InLifespan) override;
 
 public:
 	void SetProjectileDirection(const FVector& Direction);
-
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastPlayEffect(UParticleSystem* TargetPS);
+	void PlayEffect(UParticleSystem* TargetPS);
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
@@ -55,4 +54,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	UParticleSystem* HitPawnPS;
+
+	UPROPERTY(EditDefaultsOnly)
+	UParticleSystem* HitNonePS;
 };
