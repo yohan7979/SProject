@@ -23,6 +23,8 @@ void ASPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("Attack", IE_Pressed, this, &ASPlayerController::BeginAttack);
 	InputComponent->BindAction("Attack", IE_Released, this, &ASPlayerController::EndAttack);
+	InputComponent->BindAction("SubAttack", IE_Pressed, this, &ASPlayerController::BeginSubAttack);
+	InputComponent->BindAction("SubAttack", IE_Released, this, &ASPlayerController::EndSubAttack);
 	InputComponent->BindAction("AbilityOne", IE_Pressed, this, &ASPlayerController::AbilityOne);
 	InputComponent->BindAction("AbilityTwo", IE_Pressed, this, &ASPlayerController::AbilityTwo);
 
@@ -80,6 +82,22 @@ void ASPlayerController::EndAttack()
 	if (CachedCharacter != nullptr)
 	{
 		CachedCharacter->EndAttack();
+	}
+}
+
+void ASPlayerController::BeginSubAttack()
+{
+	if (CachedCharacter != nullptr)
+	{
+		CachedCharacter->BeginSubAttack();
+	}
+}
+
+void ASPlayerController::EndSubAttack()
+{
+	if (CachedCharacter != nullptr)
+	{
+		CachedCharacter->EndSubAttack();
 	}
 }
 

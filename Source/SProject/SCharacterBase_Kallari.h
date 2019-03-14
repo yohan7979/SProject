@@ -6,6 +6,7 @@
 #include "SCharacterBase.h"
 #include "SCharacterBase_Kallari.generated.h"
 
+class ASProjectile;
 /**
  * 
  */
@@ -26,6 +27,8 @@ public:
 	virtual bool ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSkillType) override;
 	virtual void NotifiedSkillFinished(ESkillType SkillType) override;
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerCreateDagger();
 	void ThrowDagger();
 
 	UFUNCTION()
@@ -34,4 +37,13 @@ public:
 	UFUNCTION()
 	void OnRoundCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ASProjectile> DaggerProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	float DaggerRange;
+	FName DaggerSocketName;
+	FTimerHandle TimerHandle_DaggerThrow;
 };

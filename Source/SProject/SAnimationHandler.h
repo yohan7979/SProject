@@ -22,7 +22,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	void PlayAnimationMontage(EAnimMontageType eAnimType, FName SectionName = NAME_None);
+	void PlayAnimationMontage(EAnimMontageType eAnimType, FName SectionName = NAME_None, bool bReverse = false);
 	void StopAnimationMontage(EAnimMontageType eAnimType);
 
 private:

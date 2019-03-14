@@ -63,6 +63,16 @@ void ASCharacterBase::EndAttack()
 	GetWorldTimerManager().ClearTimer(TimerHandle_AttackCooldown);
 }
 
+void ASCharacterBase::BeginSubAttack()
+{
+
+}
+
+void ASCharacterBase::EndSubAttack()
+{
+
+}
+
 void ASCharacterBase::DoAttack()
 {
 	EAnimMontageType AnimType;
@@ -218,7 +228,21 @@ void ASCharacterBase::ResetComboCount()
 
 void ASCharacterBase::NotifiedSkillFinished(ESkillType SkillType)
 {
-	UE_LOG(LogTemp, Log, TEXT("Skill is Finished."));
+	UE_LOG(LogTemp, Log, TEXT("Skill %d is Finished."), static_cast<int>(SkillType));
+}
+
+float ASCharacterBase::GetSkillDamage() const
+{
+	if (AbilityComp != nullptr)
+	{
+		USkill* TargetSkill = AbilityComp->GetCurrentSkill();
+		if (TargetSkill != nullptr)
+		{
+			return TargetSkill->GetDamage();
+		}
+	}
+
+	return NormalDamage;
 }
 
 void ASCharacterBase::OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController)
@@ -231,23 +255,16 @@ void ASCharacterBase::OnHealthChanged(float CurrentHealth, float DamageAmount, A
 	UE_LOG(LogTemp, Warning, TEXT("Causer : %s, Actor: %s, CurrentHealth : %f, Damage : %f"), *DamageCauser->GetName(), *GetName(), CurrentHealth, DamageAmount);
 }
 
-void ASCharacterBase::DoSpeicalAction(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName, bool bPlay)
+void ASCharacterBase::DoSpeicalAction(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName)
 {
 	if (AnimationHandler != nullptr)
 	{
-		if (bPlay)
-		{
-			AnimationHandler->PlayAnimationMontage(eAnimType, SectionName);
-		}
-		else
-		{
-			AnimationHandler->StopAnimationMontage(eAnimType);
-		}
+		AnimationHandler->PlayAnimationMontage(eAnimType, SectionName);
 	}
 
 	if (AbilityComp != nullptr)
 	{
-		AbilityComp->SetCurrentSkillType(bPlay ? eSkillType : ESkillType::EAST_None);
+		AbilityComp->SetCurrentSkillType(eSkillType);
 	}
 }
 
@@ -291,22 +308,22 @@ bool ASCharacterBase::ServerSetDied_Validate(bool isDie)
 	return true;
 }
 
-void ASCharacterBase::MulticastDoSpecialAction_Implementation(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName, bool bPlay)
+void ASCharacterBase::MulticastDoSpecialAction_Implementation(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName)
 {
 	// SimulatedProxy를 대상으로만 수행한다. (데디는 실행할 필요없고, AutonomousProxy는 로컬에서 실행하였음)
 	if (Role == ROLE_SimulatedProxy)
 	{
-		DoSpeicalAction(eAnimType, eSkillType, SectionName, bPlay);
+		DoSpeicalAction(eAnimType, eSkillType, SectionName);
 	}
 }
 
-void ASCharacterBase::ServerDoSpecialAction_Implementation(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName, bool bPlay)
+void ASCharacterBase::ServerDoSpecialAction_Implementation(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName)
 {
 	// 서버에서 액션을 멀티캐스트한다.
-	MulticastDoSpecialAction(eAnimType, eSkillType, SectionName, bPlay);
+	MulticastDoSpecialAction(eAnimType, eSkillType, SectionName);
 }
 
-bool ASCharacterBase::ServerDoSpecialAction_Validate(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName, bool bPlay)
+bool ASCharacterBase::ServerDoSpecialAction_Validate(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName)
 {
 	return true;
 }

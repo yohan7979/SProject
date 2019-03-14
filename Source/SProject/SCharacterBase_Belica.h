@@ -23,7 +23,19 @@ protected:
 
 public:
 	virtual void DoAttack() override;
+	virtual void BeginSubAttack() override;
+	virtual void EndSubAttack() override;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerZoom(bool InZoom);
+
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
 	FName MuzzleSocketName;
+
+public:
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	bool bZoom;
 };

@@ -17,7 +17,7 @@ void USAnimationHandler::BeginPlay()
 	CachedCharacter = Cast<ASCharacterBase>(GetOwner());
 }
 
-void USAnimationHandler::PlayAnimationMontage(EAnimMontageType eAnimType, FName SectionName)
+void USAnimationHandler::PlayAnimationMontage(EAnimMontageType eAnimType, FName SectionName, bool bReverse)
 {
 	if (CachedCharacter == nullptr)
 		return;
@@ -25,7 +25,7 @@ void USAnimationHandler::PlayAnimationMontage(EAnimMontageType eAnimType, FName 
 	UAnimMontage** DesireToPlay = AnimMontageList.Find(eAnimType);
 	if (DesireToPlay != nullptr)
 	{
-		CachedCharacter->PlayAnimMontage(*DesireToPlay, 1.f, SectionName);
+		CachedCharacter->PlayAnimMontage(*DesireToPlay, bReverse ? -1.f : 1.f, SectionName);
 	}
 }
 

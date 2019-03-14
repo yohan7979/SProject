@@ -27,6 +27,8 @@ public:
 	void LookUp(float fValue);
 	void BeginAttack();
 	void EndAttack();
+	void BeginSubAttack();
+	void EndSubAttack();
 	void Jump(bool bPressed);
 
 	void AbilityOne();

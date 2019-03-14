@@ -27,6 +27,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerRequestDealDamage(AActor* OtherActor, float BaseDamage);
 
@@ -38,11 +39,11 @@ protected:
 	virtual void PlayImpactEffect(const FHitResult& HitResult);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerDoSpecialAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None, FName SectionName = NAME_None, bool bPlay = true);
+	void ServerDoSpecialAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None, FName SectionName = NAME_None);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastDoSpecialAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None, FName SectionName = NAME_None, bool bPlay = true);
-	virtual void DoSpeicalAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None, FName SectionName = NAME_None, bool bPlay=true);
+	void MulticastDoSpecialAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None, FName SectionName = NAME_None);
+	virtual void DoSpeicalAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None, FName SectionName = NAME_None);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSetDied(bool isDie);
@@ -50,7 +51,6 @@ protected:
 	UFUNCTION()
 	virtual void OnRep_Died();
 
-public:
 	virtual void Tick(float DeltaTime) override;
 	USAttributeComponent* GetAttributeComp() const { return AttributeComp; }
 
@@ -58,6 +58,8 @@ public:
 	void Move(const FVector& Direction, float fValue);
 	void BeginAttack();
 	void EndAttack();
+	virtual void BeginSubAttack();
+	virtual void EndSubAttack();
 	virtual void DoAttack();
 	virtual void DoJump();
 	virtual void StopJump();
@@ -69,6 +71,7 @@ public:
 	void CalculateComboCount();
 	void ResetComboCount();
 	virtual void NotifiedSkillFinished(ESkillType SkillType);
+	float GetSkillDamage() const;
 
 	UFUNCTION()
 	void OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController);
