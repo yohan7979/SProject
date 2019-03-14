@@ -24,7 +24,7 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetLifeSpan(float InLifespan) override;
+	virtual void Destroyed() override;
 
 public:
 	void SetProjectileDirection(const FVector& Direction);

@@ -48,14 +48,14 @@ void ASProjectile::Tick(float DeltaTime)
 
 }
 
-void ASProjectile::SetLifeSpan(float InLifespan)
+void ASProjectile::Destroyed()
 {
 	if (HitNonePS != nullptr)
 	{
 		PlayEffect(HitNonePS);
 	}
-	
-	Super::SetLifeSpan(InLifespan);
+
+	Super::Destroyed();
 }
 
 void ASProjectile::SetProjectileDirection(const FVector& Direction)
