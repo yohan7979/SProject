@@ -21,7 +21,7 @@ ASCharacterBase::ASCharacterBase()
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->bUsePawnControlRotation = true;
 	SpringArmComp->SetupAttachment(RootComponent);
-
+	
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
 
@@ -80,8 +80,10 @@ void ASCharacterBase::DoAttack()
 
 	GetAnimMontageByComboCount(AnimType, SkillType);
 
-	if (AbilityComp && AbilityComp->ExecuteSkill(SkillType))
+	if (AbilityComp && AbilityComp->CanExecute(SkillType))
 	{
+		AbilityComp->ExecuteSkill(SkillType);
+
 		DoSpeicalAction(AnimType, SkillType);
 		if (Role < ROLE_Authority)
 		{
@@ -105,8 +107,11 @@ void ASCharacterBase::StopJump()
 bool ASCharacterBase::ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSkillType)
 {
 	// 발동할 수 있는 지 검사
-	if (AbilityComp && AbilityComp->ExecuteSkill(eSkillType))
+	if (AbilityComp && AbilityComp->CanExecute(eSkillType))
 	{
+		// 스킬 발동 (코스트 처리)
+		AbilityComp->ExecuteSkill(eSkillType);
+
 		// 애니메이션 처리
 		DoSpeicalAction(eAnimType, eSkillType);
 		if (Role < ROLE_Authority)

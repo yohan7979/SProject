@@ -7,6 +7,7 @@
 #include "SCharacterBase_Kallari.generated.h"
 
 class ASProjectile;
+class UCurveFloat;
 /**
  * 
  */
@@ -24,12 +25,15 @@ protected:
 
 public:
 	virtual void DoAttack() override;
+	virtual void Tick(float DeltaTime) override;
 	virtual bool ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSkillType) override;
 	virtual void NotifiedSkillFinished(ESkillType SkillType) override;
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerCreateDagger();
 	void ThrowDagger();
+	void ReadyToDaggerThrow();
+	void EndThrowDagger();
 
 	UFUNCTION()
 	void OnMeleeCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -37,6 +41,12 @@ public:
 	UFUNCTION()
 	void OnRoundCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	UFUNCTION()
+	void TimelineFloatReturn(float value);
+
+	UFUNCTION()
+	void TimelineFinished();
 
 protected:
 	UPROPERTY(EditDefaultsOnly)
@@ -46,4 +56,16 @@ protected:
 	float DaggerRange;
 	FName DaggerSocketName;
 	FTimerHandle TimerHandle_DaggerThrow;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Timeline")
+	UCurveFloat* CurveFloat;
+	float StartFOV;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Timeline")
+	float EndFOV;
+
+	UPROPERTY(VisibleAnywhere)
+	UTimelineComponent* TimelineComp;
+	FOnTimelineFloat OnTimelineFloat_Dagger;
+	FOnTimelineEvent OnTimelineEvent_Dagger;
 };

@@ -10,6 +10,7 @@
 class USAttributeComponent;
 class ASCharacterBase;
 class UParticleSystem;
+class UCameraShake;
 
 UCLASS( ClassGroup=(Custom), Blueprintable)
 class SPROJECT_API USkill : public UObject

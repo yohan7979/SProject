@@ -31,7 +31,9 @@ public:
 	void AddSkillSlot(ESkillType SkillType, USkill* NewSkill);
 	void RemoveSkillSlot(ESkillType SkillType);
 
-	bool ExecuteSkill(ESkillType SkillType);
+	bool CanExecute(ESkillType SkillType);
+	void ExecuteSkill(ESkillType SkillType);
+	void CancelSkill(ESkillType SkillType);
 
 	bool CheckConditions(USkill* TargetSkill);
 	bool CheckCooldown(USkill* TargetSkill);

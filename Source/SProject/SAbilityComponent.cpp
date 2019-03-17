@@ -44,33 +44,50 @@ void USAbilityComponent::RemoveSkillSlot(ESkillType SkillType)
 	}
 }
 
-bool USAbilityComponent::ExecuteSkill(ESkillType SkillType)
+bool USAbilityComponent::CanExecute(ESkillType SkillType)
 {
 	USkill** TargetSkill = SkillSlots.Find(SkillType);
 	if (TargetSkill && CachedPawn)
 	{
 		if (CheckConditions(*TargetSkill) == true)
 		{
-			// 발동 조건 성립시, 코스트 계산 수행
-			SetSkillCost(*TargetSkill);
 			return true;
 		}
 	}
 	return false;
 }
 
+void USAbilityComponent::ExecuteSkill(ESkillType SkillType)
+{
+	USkill** TargetSkill = SkillSlots.Find(SkillType);
+	if (TargetSkill && CachedPawn)
+	{
+		// 발동 조건 성립시, 코스트 계산 수행
+		SetSkillCost(*TargetSkill);
+	}
+}
+
+void USAbilityComponent::CancelSkill(ESkillType SkillType)
+{
+	USkill** TargetSkill = SkillSlots.Find(SkillType);
+	if (TargetSkill && CachedPawn)
+	{
+		(*TargetSkill)->ClearActivate(CachedPawn);
+	}
+}
+
 bool USAbilityComponent::CheckConditions(USkill* TargetSkill)
 {
-	// 쿨다운 검사
-	if (!CheckCooldown(TargetSkill))
-		return false;
-
 	// 마나 코스트 검사
 	if (!CheckManaCost(TargetSkill))
 		return false;
 
 	// 타 스킬 발동 중인지 검사
 	if (!CheckCanActivate())
+		return false;
+
+	// 쿨다운 검사
+	if (!CheckCooldown(TargetSkill))
 		return false;
 
 	return true;
