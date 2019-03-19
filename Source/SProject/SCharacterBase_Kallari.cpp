@@ -4,6 +4,7 @@
 #include "SAttributeComponent.h"
 #include "SAbilityComponent.h"
 #include "Skill.h"
+#include "Skill_Toggle.h"
 #include "SAnimationHandler.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
@@ -12,6 +13,7 @@
 #include "SProjectile.h"
 #include "DrawDebugHelpers.h"
 #include "Camera/CameraComponent.h"
+#include "UObject/ConstructorHelpers.h"
 
 ASCharacterBase_Kallari::ASCharacterBase_Kallari()
 {
@@ -60,8 +62,7 @@ void ASCharacterBase_Kallari::DoAttack()
 {
 	if (AbilityComp && AbilityComp->IsSkillActivated(ESkillType::EAST_Two))
 	{
-		AbilityComp->GetCurrentSkill()->SetCooldown(this);
-		AbilityComp->GetCurrentSkill()->ClearActivate(this);
+		AbilityComp->ExecuteSkill(ESkillType::EAST_Two);
 
 		// 애니메이션
 		DoSpeicalAction(EAnimMontageType::EAMT_Ability_Two, ESkillType::EAST_Two, "End");
@@ -84,46 +85,6 @@ void ASCharacterBase_Kallari::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-bool ASCharacterBase_Kallari::ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSkillType)
-{
-	// 스킬 발동은 상위클래스에서 수행
-	bool bActivated =  Super::ExecuteAbility(eAnimType, eSkillType);
-
-	// 스킬 발동 후처리
-	if (bActivated)
-	{
-		switch (eSkillType)
-		{
-		case ESkillType::EAST_Two:
-			ReadyToDaggerThrow();
-			break;
-		default:
-			break;
-		}
-	}
-	else
-	{
-		switch (eSkillType)
-		{
-		case ESkillType::EAST_Two:
-			if (AbilityComp && AbilityComp->IsSkillActivated(eSkillType))
-			{
-				DoSpeicalAction(EAnimMontageType::EAMT_CancelMotion);
-				if (Role < ROLE_Authority)
-				{
-					ServerDoSpecialAction(EAnimMontageType::EAMT_CancelMotion);
-				}
-				EndThrowDagger();
-			}
-			break;
-		default:
-			break;
-		}
-	}
-
-	return bActivated;
-}
-
 void ASCharacterBase_Kallari::NotifiedSkillFinished(ESkillType SkillType)
 {
 	Super::NotifiedSkillFinished(SkillType);
@@ -131,17 +92,56 @@ void ASCharacterBase_Kallari::NotifiedSkillFinished(ESkillType SkillType)
 	switch (SkillType)
 	{
 	case ESkillType::EAST_Two:
+		AbilityComp->ExecuteSkill(SkillType);
+
 		DoSpeicalAction(EAnimMontageType::EAMT_CancelMotion);
 		if (Role < ROLE_Authority)
 		{
 			ServerDoSpecialAction(EAnimMontageType::EAMT_CancelMotion);
 		}
 
-		EndThrowDagger();
+		EndThrowDagger();	
 		break;
 	default:
 		break;
 	}
+}
+
+void ASCharacterBase_Kallari::ExecuteAbilityOne(EAnimMontageType & eAnimType)
+{
+}
+
+void ASCharacterBase_Kallari::ExecuteAbilityTwo(EAnimMontageType & eAnimType)
+{
+	bool bCasting = false;
+	if (AbilityComp)
+	{
+		USkill_Toggle* ToggleSkill = Cast<USkill_Toggle>(AbilityComp->GetTargetSkill(ESkillType::EAST_Two));
+		if (ToggleSkill)
+		{
+			bCasting = ToggleSkill->IsCasting();
+		}
+	}
+
+	// 1차 시전 : 던지기 준비
+	if (bCasting)
+	{
+		ReadyToDaggerThrow();
+	}
+	// 2차 시전 : 던지기 취소
+	else
+	{
+		eAnimType = EAnimMontageType::EAMT_CancelMotion;
+		EndThrowDagger();
+	}
+}
+
+void ASCharacterBase_Kallari::ExecuteAbilityThree(EAnimMontageType & eAnimType)
+{
+}
+
+void ASCharacterBase_Kallari::ExecuteAbilityFour(EAnimMontageType & eAnimType)
+{
 }
 
 void ASCharacterBase_Kallari::ServerCreateDagger_Implementation()

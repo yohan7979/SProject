@@ -26,8 +26,12 @@ protected:
 public:
 	virtual void DoAttack() override;
 	virtual void Tick(float DeltaTime) override;
-	virtual bool ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSkillType) override;
 	virtual void NotifiedSkillFinished(ESkillType SkillType) override;
+
+	virtual void ExecuteAbilityOne(EAnimMontageType& eAnimType);
+	virtual void ExecuteAbilityTwo(EAnimMontageType& eAnimType);
+	virtual void ExecuteAbilityThree(EAnimMontageType& eAnimType);
+	virtual void ExecuteAbilityFour(EAnimMontageType& eAnimType);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerCreateDagger();

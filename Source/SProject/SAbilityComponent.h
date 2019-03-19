@@ -43,6 +43,7 @@ public:
 
 	void SetSkillCost(USkill* TargetSkill);
 	
+	USkill* GetTargetSkill(ESkillType eSkillType);
 	USkill* GetCurrentSkill();
 	void SetCurrentSkillType(ESkillType eSkillType) { CurrentSkillType = eSkillType; }
 

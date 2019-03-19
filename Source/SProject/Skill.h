@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Object.h"
 #include "STypes.h"
+#include "Components/TimelineComponent.h"
 #include "Skill.generated.h"
 
 class USAttributeComponent;
@@ -23,21 +24,20 @@ public:
 public:
 	void SetThisSkillType(ESkillType InSkillType) { ThisSkillType = InSkillType; }
 
-	bool InCooldown(ASCharacterBase* Owner);
-	void SetCooldown(ASCharacterBase* Owner);
+	virtual bool InCooldown(ASCharacterBase* Owner);
+	virtual void SetCooldown(ASCharacterBase* Owner);
 
-	bool IsActivated(ASCharacterBase* Owner) const;
-	void SetActivate(ASCharacterBase* Owner);
-	void ClearActivate(ASCharacterBase* Owner);
-	void NotifyFinishToOwner(ASCharacterBase* Owner);
+	virtual bool IsActivated(ASCharacterBase* Owner) const;
+	virtual void SetActivate(ASCharacterBase* Owner);
+	virtual void ClearActivate(ASCharacterBase* Owner);
+	virtual void NotifyFinishToOwner(ASCharacterBase* Owner);
 
-public:
-	float GetCooldown() const { return Cooldown; }
-	float GetDamage() const { return Damage; }
-	float GetManaCost() const { return ManaCost; }
-	float GetDuration() const { return Duration; }
-	UParticleSystem* GetParticleSystemWorld() const { return PS_HitWorld; }
-	UParticleSystem* GetParticleSystemPawn() const { return PS_HitPawn; }
+	virtual float GetCooldown() const { return Cooldown; }
+	virtual float GetDamage() const { return Damage; }
+	virtual float GetManaCost() const { return ManaCost; }
+	virtual float GetDuration() const { return Duration; }
+	virtual UParticleSystem* GetParticleSystemWorld() const { return PS_HitWorld; }
+	virtual UParticleSystem* GetParticleSystemPawn() const { return PS_HitPawn; }
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

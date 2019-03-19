@@ -118,6 +118,12 @@ bool USAbilityComponent::CheckCanActivate()
 {
 	for (auto it : SkillSlots)
 	{
+		// 같은 스킬일 경우 패스
+		if (CurrentSkillType == it.Key)
+		{
+			continue;
+		}
+
 		// 다른 스킬이 발동 중이면 캔슬하지 못한다.
 		if (IsSkillActivated(it.Key))
 		{
@@ -129,15 +135,12 @@ bool USAbilityComponent::CheckCanActivate()
 
 bool USAbilityComponent::IsSkillActivated(ESkillType SkillType)
 {
-	if (SkillType == CurrentSkillType)
+	USkill* TargetSkill = GetTargetSkill(SkillType);
+	if (TargetSkill != nullptr && CachedPawn)
 	{
-		USkill* TargetSkill = GetCurrentSkill();
-		if (TargetSkill != nullptr && CachedPawn)
+		if (TargetSkill->IsActivated(CachedPawn))
 		{
-			if (TargetSkill->IsActivated(CachedPawn))
-			{
-				return true;
-			}
+			return true;
 		}
 	}
 
@@ -149,15 +152,26 @@ void USAbilityComponent::SetSkillCost(USkill* TargetSkill)
 	USAttributeComponent* AttributeComp = CachedPawn->GetAttributeComp();
 	if (TargetSkill && AttributeComp)
 	{
-		// 쿨다운
-		TargetSkill->SetCooldown(CachedPawn);
-
 		// 마나
 		AttributeComp->AddCurrentMana(-TargetSkill->GetManaCost());
 
 		// 스킬 지속 시간
 		TargetSkill->SetActivate(CachedPawn);
+
+		// 쿨다운
+		TargetSkill->SetCooldown(CachedPawn);
 	}
+}
+
+USkill* USAbilityComponent::GetTargetSkill(ESkillType eSkillType)
+{
+	USkill** TargetSkill = SkillSlots.Find(eSkillType);
+	if (TargetSkill != nullptr)
+	{
+		return *TargetSkill;
+	}
+
+	return nullptr;
 }
 
 USkill* USAbilityComponent::GetCurrentSkill()

@@ -73,6 +73,22 @@ void ASCharacterBase_Belica::EndSubAttack()
 	ServerZoom(false);
 }
 
+void ASCharacterBase_Belica::ExecuteAbilityOne(EAnimMontageType & eAnimType)
+{
+}
+
+void ASCharacterBase_Belica::ExecuteAbilityTwo(EAnimMontageType & eAnimType)
+{
+}
+
+void ASCharacterBase_Belica::ExecuteAbilityThree(EAnimMontageType & eAnimType)
+{
+}
+
+void ASCharacterBase_Belica::ExecuteAbilityFour(EAnimMontageType & eAnimType)
+{
+}
+
 void ASCharacterBase_Belica::ServerZoom_Implementation(bool InZoom)
 {
 	bZoom = InZoom;

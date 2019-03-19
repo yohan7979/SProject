@@ -66,6 +66,11 @@ public:
 	virtual void StopJump();
 
 	virtual bool ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSkillType);
+	virtual void ExecuteAbilityOne(EAnimMontageType& eAnimType);
+	virtual void ExecuteAbilityTwo(EAnimMontageType& eAnimType);
+	virtual void ExecuteAbilityThree(EAnimMontageType& eAnimType);
+	virtual void ExecuteAbilityFour(EAnimMontageType& eAnimType);
+
 
 	void SetWeaponCollision(EWeaponCollisionType eType, bool bEnable);
 	void GetAnimMontageByComboCount(EAnimMontageType& eAnimType, ESkillType& eSkillType);

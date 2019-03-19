@@ -26,6 +26,11 @@ public:
 	virtual void BeginSubAttack() override;
 	virtual void EndSubAttack() override;
 
+	virtual void ExecuteAbilityOne(EAnimMontageType& eAnimType);
+	virtual void ExecuteAbilityTwo(EAnimMontageType& eAnimType);
+	virtual void ExecuteAbilityThree(EAnimMontageType& eAnimType);
+	virtual void ExecuteAbilityFour(EAnimMontageType& eAnimType);
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerZoom(bool InZoom);
 

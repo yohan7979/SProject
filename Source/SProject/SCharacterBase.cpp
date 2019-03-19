@@ -112,6 +112,25 @@ bool ASCharacterBase::ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSki
 		// 스킬 발동 (코스트 처리)
 		AbilityComp->ExecuteSkill(eSkillType);
 
+		// 각 스킬별 애님몽타주 설정
+		switch (eSkillType)
+		{
+		case ESkillType::EAST_One:
+			ExecuteAbilityOne(eAnimType);
+			break;
+		case ESkillType::EAST_Two:
+			ExecuteAbilityTwo(eAnimType);
+			break;
+		case ESkillType::EAST_Three:
+			ExecuteAbilityThree(eAnimType);
+			break;
+		case ESkillType::EAST_Four:
+			ExecuteAbilityFour(eAnimType);
+			break;
+		default:
+			break;
+		}
+
 		// 애니메이션 처리
 		DoSpeicalAction(eAnimType, eSkillType);
 		if (Role < ROLE_Authority)
@@ -122,6 +141,22 @@ bool ASCharacterBase::ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSki
 	}
 
 	return false;
+}
+
+void ASCharacterBase::ExecuteAbilityOne(EAnimMontageType & eAnimType)
+{
+}
+
+void ASCharacterBase::ExecuteAbilityTwo(EAnimMontageType & eAnimType)
+{
+}
+
+void ASCharacterBase::ExecuteAbilityThree(EAnimMontageType & eAnimType)
+{
+}
+
+void ASCharacterBase::ExecuteAbilityFour(EAnimMontageType & eAnimType)
+{
 }
 
 void ASCharacterBase::PlayImpactEffect(const FHitResult& HitResult)
