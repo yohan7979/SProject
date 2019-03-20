@@ -75,21 +75,13 @@ void ASCharacterBase::EndSubAttack()
 
 void ASCharacterBase::DoAttack()
 {
-	EAnimMontageType AnimType;
-	ESkillType SkillType;
+	EAnimMontageType	eAnimType;
+	ESkillType			eSkillType;
 
-	GetAnimMontageByComboCount(AnimType, SkillType);
+	GetAnimMontageByComboCount(eAnimType, eSkillType);
 
-	if (AbilityComp && AbilityComp->CanExecute(SkillType))
+	if (ExecuteAbility(eAnimType, eSkillType)) // Default Settings
 	{
-		AbilityComp->ExecuteSkill(SkillType);
-
-		DoSpeicalAction(AnimType, SkillType);
-		if (Role < ROLE_Authority)
-		{
-			ServerDoSpecialAction(AnimType, SkillType);
-		}
-
 		LastAttackTime = GetWorld()->GetTimeSeconds();
 	}
 }
@@ -104,7 +96,7 @@ void ASCharacterBase::StopJump()
 	StopJumping();
 }
 
-bool ASCharacterBase::ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSkillType)
+bool ASCharacterBase::ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName)
 {
 	// 발동할 수 있는 지 검사
 	if (AbilityComp && AbilityComp->CanExecute(eSkillType))
@@ -116,26 +108,26 @@ bool ASCharacterBase::ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSki
 		switch (eSkillType)
 		{
 		case ESkillType::EAST_One:
-			ExecuteAbilityOne(eAnimType);
+			ExecuteAbilityOne(eAnimType, SectionName);
 			break;
 		case ESkillType::EAST_Two:
-			ExecuteAbilityTwo(eAnimType);
+			ExecuteAbilityTwo(eAnimType, SectionName);
 			break;
 		case ESkillType::EAST_Three:
-			ExecuteAbilityThree(eAnimType);
+			ExecuteAbilityThree(eAnimType, SectionName);
 			break;
 		case ESkillType::EAST_Four:
-			ExecuteAbilityFour(eAnimType);
+			ExecuteAbilityFour(eAnimType, SectionName);
 			break;
 		default:
 			break;
 		}
 
 		// 애니메이션 처리
-		DoSpeicalAction(eAnimType, eSkillType);
+		DoSpeicalAction(eAnimType, eSkillType, SectionName);
 		if (Role < ROLE_Authority)
 		{
-			ServerDoSpecialAction(eAnimType, eSkillType);
+			ServerDoSpecialAction(eAnimType, eSkillType, SectionName);
 		}
 		return true;
 	}
@@ -143,19 +135,19 @@ bool ASCharacterBase::ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSki
 	return false;
 }
 
-void ASCharacterBase::ExecuteAbilityOne(EAnimMontageType & eAnimType)
+void ASCharacterBase::ExecuteAbilityOne(EAnimMontageType & eAnimType, FName SectionName)
 {
 }
 
-void ASCharacterBase::ExecuteAbilityTwo(EAnimMontageType & eAnimType)
+void ASCharacterBase::ExecuteAbilityTwo(EAnimMontageType & eAnimType, FName SectionName)
 {
 }
 
-void ASCharacterBase::ExecuteAbilityThree(EAnimMontageType & eAnimType)
+void ASCharacterBase::ExecuteAbilityThree(EAnimMontageType & eAnimType, FName SectionName)
 {
 }
 
-void ASCharacterBase::ExecuteAbilityFour(EAnimMontageType & eAnimType)
+void ASCharacterBase::ExecuteAbilityFour(EAnimMontageType & eAnimType, FName SectionName)
 {
 }
 

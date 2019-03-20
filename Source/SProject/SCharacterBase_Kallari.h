@@ -28,10 +28,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void NotifiedSkillFinished(ESkillType SkillType) override;
 
-	virtual void ExecuteAbilityOne(EAnimMontageType& eAnimType);
-	virtual void ExecuteAbilityTwo(EAnimMontageType& eAnimType);
-	virtual void ExecuteAbilityThree(EAnimMontageType& eAnimType);
-	virtual void ExecuteAbilityFour(EAnimMontageType& eAnimType);
+	virtual void ExecuteAbilityOne(EAnimMontageType& eAnimType, FName SectionName = NAME_None);
+	virtual void ExecuteAbilityTwo(EAnimMontageType& eAnimType, FName SectionName = NAME_None);
+	virtual void ExecuteAbilityThree(EAnimMontageType& eAnimType, FName SectionName = NAME_None);
+	virtual void ExecuteAbilityFour(EAnimMontageType& eAnimType, FName SectionName = NAME_None);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerCreateDagger();

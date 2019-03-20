@@ -60,20 +60,22 @@ void ASCharacterBase_Kallari::BeginPlay()
 
 void ASCharacterBase_Kallari::DoAttack()
 {
-	if (AbilityComp && AbilityComp->IsSkillActivated(ESkillType::EAST_Two))
+	bool bCasting = false;
+	if (AbilityComp)
 	{
-		AbilityComp->ExecuteSkill(ESkillType::EAST_Two);
-
-		// 애니메이션
-		DoSpeicalAction(EAnimMontageType::EAMT_Ability_Two, ESkillType::EAST_Two, "End");
-		if (Role < ROLE_Authority)
+		USkill_Toggle* ToggleSkill = Cast<USkill_Toggle>(AbilityComp->GetTargetSkill(ESkillType::EAST_Two));
+		if (ToggleSkill)
 		{
-			ServerDoSpecialAction(EAnimMontageType::EAMT_Ability_Two, ESkillType::EAST_Two, "End");
+			bCasting = ToggleSkill->IsCasting();
 		}
-
-		EndThrowDagger();
-		GetWorldTimerManager().SetTimer(TimerHandle_DaggerThrow, this, &ASCharacterBase_Kallari::ServerCreateDagger, 0.2f);
 	}
+
+	// 2번 스킬 캐스팅 중 공격 명령 시, End모션 실행
+	if (bCasting)
+	{
+		ExecuteAbility(EAnimMontageType::EAMT_Ability_Two, ESkillType::EAST_Two, "End");
+	}
+	// 그 외는 일반 공격 처리
 	else
 	{
 		Super::DoAttack();
@@ -89,29 +91,36 @@ void ASCharacterBase_Kallari::NotifiedSkillFinished(ESkillType SkillType)
 {
 	Super::NotifiedSkillFinished(SkillType);
 
+	bool bCasting = false;
+
 	switch (SkillType)
 	{
 	case ESkillType::EAST_Two:
-		AbilityComp->ExecuteSkill(SkillType);
-
-		DoSpeicalAction(EAnimMontageType::EAMT_CancelMotion);
-		if (Role < ROLE_Authority)
+		if (AbilityComp)
 		{
-			ServerDoSpecialAction(EAnimMontageType::EAMT_CancelMotion);
+			USkill_Toggle* ToggleSkill = Cast<USkill_Toggle>(AbilityComp->GetTargetSkill(SkillType));
+			if (ToggleSkill)
+			{
+				bCasting = ToggleSkill->IsCasting();
+			}
 		}
 
-		EndThrowDagger();	
+		// 2번 스킬 캐스팅 중 종료 시, 캔슬 재생
+		if (bCasting)
+		{
+			ExecuteAbility(EAnimMontageType::EAMT_CancelMotion, SkillType);
+		}
 		break;
 	default:
 		break;
 	}
 }
 
-void ASCharacterBase_Kallari::ExecuteAbilityOne(EAnimMontageType & eAnimType)
+void ASCharacterBase_Kallari::ExecuteAbilityOne(EAnimMontageType & eAnimType, FName SectionName)
 {
 }
 
-void ASCharacterBase_Kallari::ExecuteAbilityTwo(EAnimMontageType & eAnimType)
+void ASCharacterBase_Kallari::ExecuteAbilityTwo(EAnimMontageType & eAnimType, FName SectionName)
 {
 	bool bCasting = false;
 	if (AbilityComp)
@@ -120,27 +129,37 @@ void ASCharacterBase_Kallari::ExecuteAbilityTwo(EAnimMontageType & eAnimType)
 		if (ToggleSkill)
 		{
 			bCasting = ToggleSkill->IsCasting();
-		}
-	}
 
-	// 1차 시전 : 던지기 준비
-	if (bCasting)
-	{
-		ReadyToDaggerThrow();
-	}
-	// 2차 시전 : 던지기 취소
-	else
-	{
-		eAnimType = EAnimMontageType::EAMT_CancelMotion;
-		EndThrowDagger();
+			// 1차 시전 : 준비
+			if (bCasting)
+			{
+				ReadyToDaggerThrow();
+			}
+			// 2차 시전 : 던지기 OR 취소
+			else
+			{
+				// 던지기의 경우 셋타이머
+				if (SectionName == "End")
+				{
+					GetWorldTimerManager().SetTimer(TimerHandle_DaggerThrow, this, &ASCharacterBase_Kallari::ServerCreateDagger, 0.2f, false);
+				}
+				// 취소
+				else
+				{
+					eAnimType = EAnimMontageType::EAMT_CancelMotion;
+				}
+			
+				EndThrowDagger();
+			}
+		}
 	}
 }
 
-void ASCharacterBase_Kallari::ExecuteAbilityThree(EAnimMontageType & eAnimType)
+void ASCharacterBase_Kallari::ExecuteAbilityThree(EAnimMontageType & eAnimType, FName SectionName)
 {
 }
 
-void ASCharacterBase_Kallari::ExecuteAbilityFour(EAnimMontageType & eAnimType)
+void ASCharacterBase_Kallari::ExecuteAbilityFour(EAnimMontageType & eAnimType, FName SectionName)
 {
 }
 

@@ -20,11 +20,10 @@ public:
 
 	virtual void SetActivate(ASCharacterBase* Owner) override;
 	virtual void ClearActivate(ASCharacterBase* Owner) override;
+	virtual void NotifyFinishToOwner(ASCharacterBase* Owner) override;
 
 	virtual float GetCooldown() const override;
 	virtual float GetManaCost() const override;
-
-	virtual void NotifyFinishToOwner(ASCharacterBase* Owner) override;
 
 public:
 	bool IsCasting() const { return bCasting; }

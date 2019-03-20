@@ -45,13 +45,19 @@ void USkill_Toggle::SetActivate(ASCharacterBase* Owner)
 	else
 	{
 		ClearActivate(Owner);
-		bCasting = false;
 	}
 }
 
 void USkill_Toggle::ClearActivate(ASCharacterBase* Owner)
 {
 	Super::ClearActivate(Owner);
+
+	bCasting = false;
+}
+
+void USkill_Toggle::NotifyFinishToOwner(ASCharacterBase* Owner)
+{
+	Super::NotifyFinishToOwner(Owner);
 
 	bCasting = false;
 }
@@ -78,11 +84,4 @@ float USkill_Toggle::GetManaCost() const
 	{
 		return SecondManaCost;
 	}
-}
-
-void USkill_Toggle::NotifyFinishToOwner(ASCharacterBase* Owner)
-{
-	Super::NotifyFinishToOwner(Owner);
-
-	bCasting = false;
 }

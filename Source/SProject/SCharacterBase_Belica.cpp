@@ -73,19 +73,19 @@ void ASCharacterBase_Belica::EndSubAttack()
 	ServerZoom(false);
 }
 
-void ASCharacterBase_Belica::ExecuteAbilityOne(EAnimMontageType & eAnimType)
+void ASCharacterBase_Belica::ExecuteAbilityOne(EAnimMontageType & eAnimType, FName SectionName)
 {
 }
 
-void ASCharacterBase_Belica::ExecuteAbilityTwo(EAnimMontageType & eAnimType)
+void ASCharacterBase_Belica::ExecuteAbilityTwo(EAnimMontageType & eAnimType, FName SectionName)
 {
 }
 
-void ASCharacterBase_Belica::ExecuteAbilityThree(EAnimMontageType & eAnimType)
+void ASCharacterBase_Belica::ExecuteAbilityThree(EAnimMontageType & eAnimType, FName SectionName)
 {
 }
 
-void ASCharacterBase_Belica::ExecuteAbilityFour(EAnimMontageType & eAnimType)
+void ASCharacterBase_Belica::ExecuteAbilityFour(EAnimMontageType & eAnimType, FName SectionName)
 {
 }
 

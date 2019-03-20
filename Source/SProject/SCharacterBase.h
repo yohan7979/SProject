@@ -65,11 +65,11 @@ public:
 	virtual void DoJump();
 	virtual void StopJump();
 
-	virtual bool ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSkillType);
-	virtual void ExecuteAbilityOne(EAnimMontageType& eAnimType);
-	virtual void ExecuteAbilityTwo(EAnimMontageType& eAnimType);
-	virtual void ExecuteAbilityThree(EAnimMontageType& eAnimType);
-	virtual void ExecuteAbilityFour(EAnimMontageType& eAnimType);
+	virtual bool ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName = NAME_None);
+	virtual void ExecuteAbilityOne(EAnimMontageType& eAnimType, FName SectionName = NAME_None);
+	virtual void ExecuteAbilityTwo(EAnimMontageType& eAnimType, FName SectionName = NAME_None);
+	virtual void ExecuteAbilityThree(EAnimMontageType& eAnimType, FName SectionName = NAME_None);
+	virtual void ExecuteAbilityFour(EAnimMontageType& eAnimType, FName SectionName = NAME_None);
 
 
 	void SetWeaponCollision(EWeaponCollisionType eType, bool bEnable);
