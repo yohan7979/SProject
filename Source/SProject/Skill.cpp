@@ -3,7 +3,6 @@
 #include "SAttributeComponent.h"
 #include "SCharacterBase.h"
 #include "TimerManager.h"
-#include "Camera/CameraShake.h"
 
 USkill::USkill()
 {

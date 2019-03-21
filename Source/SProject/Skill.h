@@ -22,6 +22,7 @@ public:
 	USkill();
 
 public:
+	ESkillType GetThisSkillType() const { return ThisSkillType; }
 	void SetThisSkillType(ESkillType InSkillType) { ThisSkillType = InSkillType; }
 
 	virtual bool InCooldown(ASCharacterBase* Owner);

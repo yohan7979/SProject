@@ -38,7 +38,7 @@ public:
 	bool CheckConditions(USkill* TargetSkill);
 	bool CheckCooldown(USkill* TargetSkill);
 	bool CheckManaCost(USkill* TargetSkill);
-	bool CheckCanActivate();
+	bool CheckCanActivate(USkill* TargetSkill);
 	bool IsSkillActivated(ESkillType SkillType);
 
 	void SetSkillCost(USkill* TargetSkill);

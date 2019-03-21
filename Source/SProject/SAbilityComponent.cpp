@@ -83,7 +83,7 @@ bool USAbilityComponent::CheckConditions(USkill* TargetSkill)
 		return false;
 
 	// 타 스킬 발동 중인지 검사
-	if (!CheckCanActivate())
+	if (!CheckCanActivate(TargetSkill))
 		return false;
 
 	// 쿨다운 검사
@@ -114,12 +114,12 @@ bool USAbilityComponent::CheckManaCost(USkill* TargetSkill)
 	return false;
 }
 
-bool USAbilityComponent::CheckCanActivate()
+bool USAbilityComponent::CheckCanActivate(USkill* TargetSkill)
 {
 	for (auto it : SkillSlots)
 	{
 		// 같은 스킬일 경우 패스
-		if (CurrentSkillType == it.Key)
+		if (TargetSkill->GetThisSkillType() == it.Key)
 		{
 			continue;
 		}

@@ -80,7 +80,7 @@ void ASCharacterBase::DoAttack()
 
 	GetAnimMontageByComboCount(eAnimType, eSkillType);
 
-	if (ExecuteAbility(eAnimType, eSkillType)) // Default Settings
+	if (ExecuteAbility(eAnimType, eSkillType))
 	{
 		LastAttackTime = GetWorld()->GetTimeSeconds();
 	}
