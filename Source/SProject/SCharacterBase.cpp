@@ -82,6 +82,7 @@ void ASCharacterBase::DoAttack()
 
 	if (ExecuteAbility(eAnimType, eSkillType))
 	{
+		CalculateComboCount();
 		LastAttackTime = GetWorld()->GetTimeSeconds();
 	}
 }
@@ -107,16 +108,16 @@ bool ASCharacterBase::ExecuteAbility(EAnimMontageType eAnimType, ESkillType eSki
 		// 각 스킬별 애님몽타주 설정
 		switch (eSkillType)
 		{
-		case ESkillType::EAST_One:
+		case ESkillType::One:
 			ExecuteAbilityOne(eAnimType, SectionName);
 			break;
-		case ESkillType::EAST_Two:
+		case ESkillType::Two:
 			ExecuteAbilityTwo(eAnimType, SectionName);
 			break;
-		case ESkillType::EAST_Three:
+		case ESkillType::Three:
 			ExecuteAbilityThree(eAnimType, SectionName);
 			break;
-		case ESkillType::EAST_Four:
+		case ESkillType::Four:
 			ExecuteAbilityFour(eAnimType, SectionName);
 			break;
 		default:
@@ -180,10 +181,10 @@ void ASCharacterBase::SetWeaponCollision(EWeaponCollisionType eType, bool bEnabl
 
 	switch (eType)
 	{
-	case EWeaponCollisionType::EWCT_Melee:
+	case EWeaponCollisionType::Melee:
 		TargetCollComp = MeleeCollComp;
 		break;
-	case EWeaponCollisionType::EWCT_Round:
+	case EWeaponCollisionType::Round:
 		TargetCollComp = RoundCollComp;
 		break;
 	default:;
@@ -204,33 +205,30 @@ void ASCharacterBase::GetAnimMontageByComboCount(EAnimMontageType& eAnimType, ES
 
 	if (GetCharacterMovement()->IsFalling() && GetVelocity().Z >= 0.f)
 	{
-		DesiredAnim = EAnimMontageType::EAMT_JumpAttack;
-		DesiredSkill = ESkillType::EAST_Basic_A;
-		ResetComboCount();
+		DesiredAnim = EAnimMontageType::JumpAttack;
+		DesiredSkill = ESkillType::Basic_A;
 	}
 	else
 	{
 		switch (ComboCount)
 		{
 		case 0:
-			DesiredAnim = EAnimMontageType::EAMT_NormalAttack_A;
-			DesiredSkill = ESkillType::EAST_Basic_A;
+			DesiredAnim = EAnimMontageType::NormalAttack_A;
+			DesiredSkill = ESkillType::Basic_A;
 			break;
 		case 1:
-			DesiredAnim = EAnimMontageType::EAMT_NormalAttack_B;
-			DesiredSkill = ESkillType::EAST_Basic_B;
+			DesiredAnim = EAnimMontageType::NormalAttack_B;
+			DesiredSkill = ESkillType::Basic_B;
 			break;
 		case 2:
-			DesiredAnim = EAnimMontageType::EAMT_NormalAttack_C;
-			DesiredSkill = ESkillType::EAST_Basic_C;
+			DesiredAnim = EAnimMontageType::NormalAttack_C;
+			DesiredSkill = ESkillType::Basic_C;
 			break;
 		default:
-			DesiredAnim = EAnimMontageType::EAMT_NormalAttack_A;
-			DesiredSkill = ESkillType::EAST_Basic_A;
+			DesiredAnim = EAnimMontageType::NormalAttack_A;
+			DesiredSkill = ESkillType::Basic_A;
 			break;
 		}
-
-		CalculateComboCount();
 	}
 
 	eAnimType = DesiredAnim;
@@ -243,6 +241,10 @@ void ASCharacterBase::CalculateComboCount()
 	if (bRandomCombo)
 	{
 		ComboCount = FMath::Rand() % MaxComboCount;
+	}
+	else if(GetCharacterMovement()->IsFalling())
+	{
+		ResetComboCount();
 	}
 	else
 	{
@@ -277,6 +279,11 @@ float ASCharacterBase::GetSkillDamage() const
 	return NormalDamage;
 }
 
+void ASCharacterBase::NotifyAnimationPlayed(FName AnimName)
+{
+
+}
+
 void ASCharacterBase::OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController)
 {
 	if (CurrentHealth <= 0.f && !bDied)
@@ -305,7 +312,7 @@ void ASCharacterBase::OnRep_Died()
 	if (bDied)
 	{
 		int iDeathIndex = FMath::Rand() % 2;
-		DoSpeicalAction(iDeathIndex == 0 ? EAnimMontageType::EAMT_Death_A : EAnimMontageType::EAMT_Death_B);
+		DoSpeicalAction(iDeathIndex == 0 ? EAnimMontageType::Death_A : EAnimMontageType::Death_B);
 
 		// 클라이언트 자신에 해당
 		if (IsLocallyControlled())

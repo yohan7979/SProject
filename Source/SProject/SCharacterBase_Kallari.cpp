@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Particles/ParticleSystem.h"
 #include "SProjectile.h"
 #include "DrawDebugHelpers.h"
@@ -36,6 +37,8 @@ ASCharacterBase_Kallari::ASCharacterBase_Kallari()
 	MaxComboCount = 3;
 	DaggerRange = 2000.f;
 	DaggerSocketName = "dagger_a_r";
+	BoostImpulseIntensity = 2000.f;
+	BoostDirectionDegree = 30.f;
 }
 
 void ASCharacterBase_Kallari::BeginPlay()
@@ -63,7 +66,7 @@ void ASCharacterBase_Kallari::DoAttack()
 	bool bCasting = false;
 	if (AbilityComp)
 	{
-		USkill_Toggle* ToggleSkill = Cast<USkill_Toggle>(AbilityComp->GetTargetSkill(ESkillType::EAST_Two));
+		USkill_Toggle* ToggleSkill = Cast<USkill_Toggle>(AbilityComp->GetTargetSkill(ESkillType::Two));
 		if (ToggleSkill)
 		{
 			bCasting = ToggleSkill->IsCasting();
@@ -73,7 +76,7 @@ void ASCharacterBase_Kallari::DoAttack()
 	// 2번 스킬 캐스팅 중 공격 명령 시, End모션 실행
 	if (bCasting)
 	{
-		ExecuteAbility(EAnimMontageType::EAMT_Ability_Two, ESkillType::EAST_Two, "End");
+		ExecuteAbility(EAnimMontageType::Ability_Two, ESkillType::Two, "End");
 	}
 	// 그 외는 일반 공격 처리
 	else
@@ -95,7 +98,7 @@ void ASCharacterBase_Kallari::NotifiedSkillFinished(ESkillType SkillType)
 
 	switch (SkillType)
 	{
-	case ESkillType::EAST_Two:
+	case ESkillType::Two:
 		if (AbilityComp)
 		{
 			USkill_Toggle* ToggleSkill = Cast<USkill_Toggle>(AbilityComp->GetTargetSkill(SkillType));
@@ -108,11 +111,37 @@ void ASCharacterBase_Kallari::NotifiedSkillFinished(ESkillType SkillType)
 		// 2번 스킬 캐스팅 중 종료 시, 캔슬 재생
 		if (bCasting)
 		{
-			ExecuteAbility(EAnimMontageType::EAMT_CancelMotion, SkillType);
+			ExecuteAbility(EAnimMontageType::CancelMotion, SkillType);
 		}
 		break;
 	default:
 		break;
+	}
+}
+
+void ASCharacterBase_Kallari::NotifyAnimationPlayed(FName AnimName)
+{
+	if (AnimName == "Boost_Start")
+	{
+		Super::DoAttack();
+	}
+}
+
+void ASCharacterBase_Kallari::Landed(const FHitResult& Hit)
+{	
+	if (AnimationHandler->IsMontangePlaying(EAnimMontageType::Ability_Three))
+	{
+		DoSpeicalAction(EAnimMontageType::Ability_Three, ESkillType::Three, "End");
+		if (Role < ROLE_Authority)
+		{
+			ServerDoSpecialAction(EAnimMontageType::Ability_Three, ESkillType::Three, "End");
+		}
+	}
+
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->FallingLateralFriction = 0.f;
+		GetCharacterMovement()->GravityScale = 1.f;
 	}
 }
 
@@ -125,7 +154,7 @@ void ASCharacterBase_Kallari::ExecuteAbilityTwo(EAnimMontageType & eAnimType, FN
 	bool bCasting = false;
 	if (AbilityComp)
 	{
-		USkill_Toggle* ToggleSkill = Cast<USkill_Toggle>(AbilityComp->GetTargetSkill(ESkillType::EAST_Two));
+		USkill_Toggle* ToggleSkill = Cast<USkill_Toggle>(AbilityComp->GetTargetSkill(ESkillType::Two));
 		if (ToggleSkill)
 		{
 			bCasting = ToggleSkill->IsCasting();
@@ -146,7 +175,7 @@ void ASCharacterBase_Kallari::ExecuteAbilityTwo(EAnimMontageType & eAnimType, FN
 				// 취소
 				else
 				{
-					eAnimType = EAnimMontageType::EAMT_CancelMotion;
+					eAnimType = EAnimMontageType::CancelMotion;
 				}
 			
 				EndThrowDagger();
@@ -157,6 +186,7 @@ void ASCharacterBase_Kallari::ExecuteAbilityTwo(EAnimMontageType & eAnimType, FN
 
 void ASCharacterBase_Kallari::ExecuteAbilityThree(EAnimMontageType & eAnimType, FName SectionName)
 {
+	ServerBoostSimluation();
 }
 
 void ASCharacterBase_Kallari::ExecuteAbilityFour(EAnimMontageType & eAnimType, FName SectionName)
@@ -169,6 +199,24 @@ void ASCharacterBase_Kallari::ServerCreateDagger_Implementation()
 }
 
 bool ASCharacterBase_Kallari::ServerCreateDagger_Validate()
+{
+	return true;
+}
+
+void ASCharacterBase_Kallari::ServerBoostSimluation_Implementation()
+{
+	UCharacterMovementComponent* MovementComp = GetCharacterMovement();
+
+	if (MovementComp)
+	{
+		MovementComp->Velocity = FVector::ZeroVector;
+		MovementComp->FallingLateralFriction = 0.5f;
+		MovementComp->GravityScale = 1.5f;
+		MovementComp->AddImpulse(GetActorForwardVector().RotateAngleAxis(-BoostDirectionDegree, GetActorRightVector()) * BoostImpulseIntensity, true);
+	}
+}
+
+bool ASCharacterBase_Kallari::ServerBoostSimluation_Validate()
 {
 	return true;
 }
@@ -202,6 +250,7 @@ void ASCharacterBase_Kallari::ThrowDagger()
 	if (Projectile != nullptr)
 	{
 		Projectile->SetProjectileDirection(AimDir);
+		//Projectile->SetProjectileDamage(GetSkillDamage());
 	}
 
 	//DrawDebugLine(GetWorld(), SocketLocation, SocketLocation + AimDir * DaggerRange, FColor::Red, false, 3.f);

@@ -27,6 +27,8 @@ void ASPlayerController::SetupInputComponent()
 	InputComponent->BindAction("SubAttack", IE_Released, this, &ASPlayerController::EndSubAttack);
 	InputComponent->BindAction("AbilityOne", IE_Pressed, this, &ASPlayerController::AbilityOne);
 	InputComponent->BindAction("AbilityTwo", IE_Pressed, this, &ASPlayerController::AbilityTwo);
+	InputComponent->BindAction("AbilityThree", IE_Pressed, this, &ASPlayerController::AbilityThree);
+	InputComponent->BindAction("AbilityFour", IE_Pressed, this, &ASPlayerController::AbilityFour);
 
 	InputComponent->BindAction<FJumpInputDelegate>("Jump", IE_Pressed, this, &ASPlayerController::Jump, true);
 	InputComponent->BindAction<FJumpInputDelegate>("Jump", IE_Released, this, &ASPlayerController::Jump, false);
@@ -120,7 +122,7 @@ void ASPlayerController::AbilityOne()
 {
 	if (CachedCharacter != nullptr)
 	{
-		CachedCharacter->ExecuteAbility(EAnimMontageType::EAMT_Ability_One, ESkillType::EAST_One);
+		CachedCharacter->ExecuteAbility(EAnimMontageType::Ability_One, ESkillType::One);
 	}
 }
 
@@ -128,7 +130,7 @@ void ASPlayerController::AbilityTwo()
 {
 	if (CachedCharacter != nullptr)
 	{
-		CachedCharacter->ExecuteAbility(EAnimMontageType::EAMT_Ability_Two, ESkillType::EAST_Two);
+		CachedCharacter->ExecuteAbility(EAnimMontageType::Ability_Two, ESkillType::Two);
 	}
 }
 
@@ -136,15 +138,15 @@ void ASPlayerController::AbilityThree()
 {
 	if (CachedCharacter != nullptr)
 	{
-		CachedCharacter->ExecuteAbility(EAnimMontageType::EAMT_Ability_Three, ESkillType::EAST_Three);
+		CachedCharacter->ExecuteAbility(EAnimMontageType::Ability_Three, ESkillType::Three);
 	}
 }
 
-void ASPlayerController::AbliityFour()
+void ASPlayerController::AbilityFour()
 {
 	if (CachedCharacter != nullptr)
 	{
-		CachedCharacter->ExecuteAbility(EAnimMontageType::EAMT_Ability_Four, ESkillType::EAST_Four);
+		CachedCharacter->ExecuteAbility(EAnimMontageType::Ability_Four, ESkillType::Four);
 	}
 }
 

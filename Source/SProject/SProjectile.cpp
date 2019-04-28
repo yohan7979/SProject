@@ -91,9 +91,9 @@ void ASProjectile::OnOverlapped(UPrimitiveComponent* OverlappedComponent, AActor
 	
 	if (HitActor && Owner && HitActor != Owner)
 	{
-		if (Owner->IsLocallyControlled())
+		if (Role == ROLE_Authority)
 		{
-			// 데미지 처리 요청은, Instigator가 직접 서버에 하도록 한다.
+			// 서버에서 Overlapped 판정일 때 데미지를 준다.
 			Owner->ServerRequestDealDamage(HitActor, Owner->GetSkillDamage());
 		}
 		

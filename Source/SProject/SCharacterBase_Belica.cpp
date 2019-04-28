@@ -53,10 +53,10 @@ void ASCharacterBase_Belica::DoAttack()
 
 void ASCharacterBase_Belica::BeginSubAttack()
 {
-	DoSpeicalAction(EAnimMontageType::EAMT_NormalAttack_B, ESkillType::EAST_Basic_B);
+	DoSpeicalAction(EAnimMontageType::NormalAttack_B, ESkillType::Basic_B);
 	if (Role < ROLE_Authority)
 	{
-		ServerDoSpecialAction(EAnimMontageType::EAMT_NormalAttack_B, ESkillType::EAST_Basic_B);
+		ServerDoSpecialAction(EAnimMontageType::NormalAttack_B, ESkillType::Basic_B);
 	}
 
 	ServerZoom(true);
@@ -64,10 +64,10 @@ void ASCharacterBase_Belica::BeginSubAttack()
 
 void ASCharacterBase_Belica::EndSubAttack()
 {
-	DoSpeicalAction(EAnimMontageType::EAMT_NormalAttack_B, ESkillType::EAST_Basic_B, "End");
+	DoSpeicalAction(EAnimMontageType::NormalAttack_B, ESkillType::Basic_B, "End");
 	if (Role < ROLE_Authority)
 	{
-		ServerDoSpecialAction(EAnimMontageType::EAMT_NormalAttack_B, ESkillType::EAST_Basic_B, "End");
+		ServerDoSpecialAction(EAnimMontageType::NormalAttack_B, ESkillType::Basic_B, "End");
 	}
 
 	ServerZoom(false);

@@ -25,6 +25,8 @@ public:
 	void PlayAnimationMontage(EAnimMontageType eAnimType, FName SectionName = NAME_None, bool bReverse = false);
 	void StopAnimationMontage(EAnimMontageType eAnimType);
 
+	bool IsMontangePlaying(EAnimMontageType eAnimType);
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category="AnimMontage")
 	TMap<EAnimMontageType, UAnimMontage*> AnimMontageList;

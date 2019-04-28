@@ -34,7 +34,7 @@ public:
 	void AbilityOne();
 	void AbilityTwo();
 	void AbilityThree();
-	void AbliityFour();
+	void AbilityFour();
 
 	void SetControlledPawn(ASCharacterBase* InPawn);
 	

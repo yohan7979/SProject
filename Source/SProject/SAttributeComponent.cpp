@@ -25,6 +25,7 @@ void USAttributeComponent::BeginPlay()
 		if (Owner)
 		{
 			Owner->OnTakeAnyDamage.AddDynamic(this, &USAttributeComponent::HandleTakeAnyDamage);
+			//Owner->OnTakeRadialDamage.AddDynamic(this, &USAttributeComponent::HandleTakeRadialDamage);
 		}
 	}
 }
@@ -51,6 +52,14 @@ void USAttributeComponent::AddCurrentMana(float InMana)
 }
 
 void USAttributeComponent::HandleTakeAnyDamage(AActor * DamagedActor, float Damage, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
+{
+	CurrentHealth -= Damage;
+	CurrentHealth = FMath::Clamp(CurrentHealth, 0.f, MaxHelth);
+
+	OnHealthChanged.Broadcast(CurrentHealth, Damage, DamageCauser, InstigatedBy);
+}
+
+void USAttributeComponent::HandleTakeRadialDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, FVector Origin, FHitResult HitInfo, class AController* InstigatedBy, AActor* DamageCauser)
 {
 	CurrentHealth -= Damage;
 	CurrentHealth = FMath::Clamp(CurrentHealth, 0.f, MaxHelth);

@@ -40,11 +40,11 @@ public:
 	virtual void PlayImpactEffect(const FHitResult& HitResult);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerDoSpecialAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None, FName SectionName = NAME_None);
+	void ServerDoSpecialAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::None, FName SectionName = NAME_None);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastDoSpecialAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None, FName SectionName = NAME_None);
-	virtual void DoSpeicalAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::EAST_None, FName SectionName = NAME_None);
+	void MulticastDoSpecialAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::None, FName SectionName = NAME_None);
+	virtual void DoSpeicalAction(EAnimMontageType eAnimType, ESkillType eSkillType = ESkillType::None, FName SectionName = NAME_None);
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSetDied(bool isDie);
@@ -78,6 +78,8 @@ public:
 	void ResetComboCount();
 	virtual void NotifiedSkillFinished(ESkillType SkillType);
 	float GetSkillDamage() const;
+
+	virtual void NotifyAnimationPlayed(FName AnimName);
 
 	UFUNCTION()
 	void OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController);

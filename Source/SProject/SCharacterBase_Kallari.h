@@ -27,7 +27,9 @@ public:
 	virtual void DoAttack() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void NotifiedSkillFinished(ESkillType SkillType) override;
-
+	virtual void NotifyAnimationPlayed(FName AnimName) override;
+	virtual void Landed(const FHitResult& Hit) override;
+	
 	virtual void ExecuteAbilityOne(EAnimMontageType& eAnimType, FName SectionName = NAME_None);
 	virtual void ExecuteAbilityTwo(EAnimMontageType& eAnimType, FName SectionName = NAME_None);
 	virtual void ExecuteAbilityThree(EAnimMontageType& eAnimType, FName SectionName = NAME_None);
@@ -35,6 +37,9 @@ public:
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerCreateDagger();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerBoostSimluation();
 	void ThrowDagger();
 	void ReadyToDaggerThrow();
 	void EndThrowDagger();
@@ -72,4 +77,10 @@ protected:
 	UTimelineComponent* TimelineComp;
 	FOnTimelineFloat OnTimelineFloat_Dagger;
 	FOnTimelineEvent OnTimelineEvent_Dagger;
+
+	UPROPERTY(EditDefaultsOnly)
+	float BoostImpulseIntensity;
+
+	UPROPERTY(EditDefaultsOnly)
+	float BoostDirectionDegree;
 };
