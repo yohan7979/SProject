@@ -349,11 +349,12 @@ bool ASCharacterBase::ServerSetDied_Validate(bool isDie)
 
 void ASCharacterBase::MulticastDoSpecialAction_Implementation(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName)
 {
-	// SimulatedProxy를 대상으로만 수행한다. (데디는 실행할 필요없고, AutonomousProxy는 로컬에서 실행하였음)
-	if (Role == ROLE_SimulatedProxy)
+	if (Role == ROLE_AutonomousProxy)
 	{
-		DoSpeicalAction(eAnimType, eSkillType, SectionName);
+		return;
 	}
+
+	DoSpeicalAction(eAnimType, eSkillType, SectionName);
 }
 
 void ASCharacterBase::ServerDoSpecialAction_Implementation(EAnimMontageType eAnimType, ESkillType eSkillType, FName SectionName)

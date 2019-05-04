@@ -108,7 +108,7 @@ void ASCharacterBase_Phase::StartCastingMeteor()
 		{
 		}
 
-		bUseControllerRotationYaw = false;
+		//bUseControllerRotationYaw = false;
 	}
 }
 
@@ -119,7 +119,7 @@ void ASCharacterBase_Phase::EndCastingMeteor()
 		TargetActor->Destroy();
 	}
 
-	bUseControllerRotationYaw = true;
+	//bUseControllerRotationYaw = true;
 }
 
 void ASCharacterBase_Phase::DropMeteor()
@@ -148,7 +148,7 @@ void ASCharacterBase_Phase::ServerDropMeteor_Implementation(const FVector& Targe
 		if (Projectile)
 		{
 			Projectile->SetProjectileDirection(ProjectileDir);
-			//Projectile->SetProjectileDamage(GetSkillDamage());
+			Projectile->SetProjectileDamage(GetSkillDamage());
 		}
 	}
 }

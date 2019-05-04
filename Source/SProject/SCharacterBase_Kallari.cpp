@@ -250,7 +250,7 @@ void ASCharacterBase_Kallari::ThrowDagger()
 	if (Projectile != nullptr)
 	{
 		Projectile->SetProjectileDirection(AimDir);
-		//Projectile->SetProjectileDamage(GetSkillDamage());
+		Projectile->SetProjectileDamage(GetSkillDamage());
 	}
 
 	//DrawDebugLine(GetWorld(), SocketLocation, SocketLocation + AimDir * DaggerRange, FColor::Red, false, 3.f);
