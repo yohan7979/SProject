@@ -50,11 +50,8 @@ void ASProjectile::Tick(float DeltaTime)
 
 void ASProjectile::Destroyed()
 {
-	if (HitNonePS != nullptr)
-	{
-		PlayEffect(HitNonePS);
-	}
-
+	PlayEffect(HitNonePS);
+	
 	Super::Destroyed();
 }
 
@@ -63,45 +60,52 @@ void ASProjectile::SetProjectileDirection(const FVector& Direction)
 	ProjectileMovementComp->Velocity = Direction * ProjectileMovementComp->InitialSpeed;
 }
 
-void ASProjectile::PlayEffect(UParticleSystem* TargetPS)
+void ASProjectile::PlayEffect(TSoftObjectPtr<UParticleSystem> TargetPS)
 {
 	if (GetNetMode() == NM_DedicatedServer)
 		return;
 
-	if (TargetPS != nullptr)
+	if (TargetPS.IsValid())
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), TargetPS, GetTransform());
+		UParticleSystem* LoadedPS = TargetPS.LoadSynchronous();
+		if (LoadedPS)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), LoadedPS, GetTransform());
+		}
 	}
 }
 
 void ASProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (HitWorldPS != nullptr)
-	{
-		PlayEffect(HitWorldPS);
-	}
-	
+	PlayEffect(HitWorldPS);
 	Destroy();
 }
 
 void ASProjectile::OnOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	ASCharacterBase* HitActor = Cast<ASCharacterBase>(OtherActor);
-	ASCharacterBase* Owner = Cast<ASCharacterBase>(GetOwner());
+	ASCharacterBase* OwnerPawn = Cast<ASCharacterBase>(GetOwner());
 	
-	if (HitActor && Owner && HitActor != Owner)
+	if (HitActor && OwnerPawn && HitActor != OwnerPawn)
 	{
 		if (Role == ROLE_Authority)
 		{
 			// 서버에서 Overlapped 판정일 때 데미지를 준다.
-			Owner->ServerRequestDealDamage(HitActor, Owner->GetSkillDamage());
+			OwnerPawn->ServerRequestDealDamage(HitActor, OwnerPawn->GetSkillDamage());
 		}
 		
-		if (HitPawnPS != nullptr)
-		{
-			PlayEffect(HitPawnPS);
-		}
-
+		PlayEffect(HitPawnPS);
 		Destroy();
+	}
+}
+
+void ASProjectile::AddPreloadContent(FPreloadContentContainer& Collector, bool bIsDedicateServer)
+{
+	if (!bIsDedicateServer)
+	{
+		Collector.Add(SpawnPS);
+		Collector.Add(HitWorldPS);
+		Collector.Add(HitPawnPS);
+		Collector.Add(HitNonePS);
 	}
 }

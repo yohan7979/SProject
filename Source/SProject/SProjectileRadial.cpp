@@ -22,22 +22,18 @@ void ASProjectileRadial::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherA
 {
 	if (Role == ROLE_Authority && !IsPendingKillPending())
 	{
-		ASCharacterBase* Owner = Cast<ASCharacterBase>(GetOwner());
-		if (Owner)
+		ASCharacterBase* OwnerPawn = Cast<ASCharacterBase>(GetOwner());
+		if (OwnerPawn)
 		{
 			TArray<AActor*> IgnoreActor;
 			IgnoreActor.Add(this);
-			IgnoreActor.Add(Owner);
+			IgnoreActor.Add(OwnerPawn);
 
-			UGameplayStatics::ApplyRadialDamage(this, ProjectileDamage, GetActorLocation(), ExplodeRadius, nullptr, IgnoreActor, this, Owner->GetController(), true, ECC_GameTraceChannel1);
+			UGameplayStatics::ApplyRadialDamage(this, ProjectileDamage, GetActorLocation(), ExplodeRadius, nullptr, IgnoreActor, this, OwnerPawn->GetController(), true, ECC_GameTraceChannel1);
 		}
 	}
 
-	if (HitWorldPS != nullptr)
-	{
-		PlayEffect(HitWorldPS);
-	}
-
+	PlayEffect(HitWorldPS);
 	Destroy();
 }
 

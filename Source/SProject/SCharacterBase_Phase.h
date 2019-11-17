@@ -35,10 +35,21 @@ public:
 	void EndCastingMeteor();
 	void DropMeteor();
 
+	void ThrowStar();
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerDropMeteor(const FVector& TargetLocation);
 
 public:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ASProjectile> BaseProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	FName LeftHandSocketName;
+
+	UPROPERTY(EditDefaultsOnly)
+	FName RightHandSocketName;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Meteor")
 	TSubclassOf<ASTargetActor> TargetActorClass;
 

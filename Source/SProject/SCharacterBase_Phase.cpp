@@ -15,6 +15,8 @@ ASCharacterBase_Phase::ASCharacterBase_Phase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	DropStartHeight = 200.f;
+	LeftHandSocketName = FName(TEXT("hand_l"));
+	RightHandSocketName = FName(TEXT("hand_r"));
 }
 
 void ASCharacterBase_Phase::BeginPlay()
@@ -49,6 +51,8 @@ void ASCharacterBase_Phase::DoAttack()
 	else
 	{
 		Super::DoAttack();
+
+		ThrowStar();
 	}
 }
 
@@ -134,22 +138,32 @@ void ASCharacterBase_Phase::DropMeteor()
 	EndCastingMeteor();
 }
 
+void ASCharacterBase_Phase::ThrowStar()
+{
+	// 프로젝타일 - Spawn On Server
+	FVector AimDir = GetControlRotation().Vector();
+	const FName& TargetSocketName = (ComboCount % 2 == 0) ? LeftHandSocketName : RightHandSocketName;
+	const FVector& SocketLocation = GetMesh()->GetSocketLocation(TargetSocketName);
+
+	FHitResult Hit(1.f);
+	if (DoHitScanTrace(Hit))
+	{
+		AimDir = Hit.ImpactPoint - Hit.TraceStart;
+		AimDir.Normalize();
+	}
+
+	//FVector SocketLocation = GetMesh()->GetSocketLocation(DaggerSocketName);
+	CreateProjectile(BaseProjectileClass, SocketLocation, AimDir.Rotation());
+}
+
 void ASCharacterBase_Phase::ServerDropMeteor_Implementation(const FVector& TargetLocation)
 {
 	if (MeteorProjectileClass)
 	{
 		FVector DropLocation(TargetLocation.X, TargetLocation.Y, TargetLocation.Z + DropStartHeight);
 		FVector ProjectileDir = FVector::UpVector * -1;
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = this;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		ASProjectile* Projectile = GetWorld()->SpawnActor<ASProjectile>(MeteorProjectileClass, DropLocation, ProjectileDir.Rotation(), SpawnParams);
-		if (Projectile)
-		{
-			Projectile->SetProjectileDirection(ProjectileDir);
-			Projectile->SetProjectileDamage(GetSkillDamage());
-		}
+		CreateProjectile(MeteorProjectileClass, DropLocation, ProjectileDir.Rotation());
 	}
 }
 

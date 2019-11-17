@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "SPlayerController.h"
 #include "Skill.h"
+#include "SProjectile.h"
 
 ASCharacterBase::ASCharacterBase()
 {
@@ -20,6 +21,7 @@ ASCharacterBase::ASCharacterBase()
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->bUsePawnControlRotation = true;
+	SpringArmComp->SetRelativeLocation(FVector(0.f, 60.f, 100.f));
 	SpringArmComp->SetupAttachment(RootComponent);
 	
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
@@ -158,7 +160,7 @@ void ASCharacterBase::PlayImpactEffect(const FHitResult& HitResult)
 	AActor* HitActor = HitResult.GetActor();
 	if (TargetSkill && HitActor)
 	{
-		UParticleSystem* ParticleToPlay;
+		UParticleSystem* ParticleToPlay = nullptr;
 		if (Cast<ASCharacterBase>(HitActor) != nullptr)
 		{
 			ParticleToPlay = TargetSkill->GetParticleSystemPawn();
@@ -223,6 +225,10 @@ void ASCharacterBase::GetAnimMontageByComboCount(EAnimMontageType& eAnimType, ES
 		case 2:
 			DesiredAnim = EAnimMontageType::NormalAttack_C;
 			DesiredSkill = ESkillType::Basic_C;
+			break;
+		case 3:
+			DesiredAnim = EAnimMontageType::NormalAttack_D;
+			DesiredSkill = ESkillType::Basic_D;
 			break;
 		default:
 			DesiredAnim = EAnimMontageType::NormalAttack_A;
@@ -396,6 +402,32 @@ void ASCharacterBase::ServerPlayImpactEffect_Implementation(const FHitResult& Hi
 bool ASCharacterBase::ServerPlayImpactEffect_Validate(const FHitResult& HitResult)
 {
 	return true;
+}
+
+bool ASCharacterBase::DoHitScanTrace(FHitResult& HitResult) const
+{
+	FVector StartTrace = GetPawnViewLocation();
+	FVector AimDirection = GetControlRotation().Vector();
+	FVector EndTrace = StartTrace + AimDirection * 10000.f; // TODO: Make Range
+
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	return GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_GameTraceChannel1, CollisionParams);
+}
+
+void ASCharacterBase::CreateProjectile(UClass* InClass, const FVector& SpawnLocation, const FRotator& SpawnRotation)
+{
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = Instigator;
+
+	ASProjectile* Projectile = GetWorld()->SpawnActor<ASProjectile>(InClass, SpawnLocation, SpawnRotation, SpawnParams);
+	if (Projectile != nullptr)
+	{
+		Projectile->SetProjectileDirection(SpawnRotation.Vector().GetSafeNormal());
+		Projectile->SetProjectileDamage(GetSkillDamage());
+	}
 }
 
 void ASCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

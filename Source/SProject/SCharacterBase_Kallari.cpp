@@ -227,31 +227,18 @@ void ASCharacterBase_Kallari::ThrowDagger()
 		return;
 
 	// 프로젝타일 - Spawn On Server
-	FVector StartTrace = GetPawnViewLocation();
 	FVector AimDir = GetControlRotation().Vector();
-	FVector EndTrace = StartTrace + AimDir * 10000.f;
 
 	FHitResult Hit(1.f);
-	FCollisionQueryParams CollisionQueries;
-	CollisionQueries.AddIgnoredActor(this);
-
-	if (GetWorld()->LineTraceSingleByChannel(Hit, StartTrace, EndTrace, ECC_GameTraceChannel1, CollisionQueries))
+	if (DoHitScanTrace(Hit))
 	{
-		AimDir = Hit.ImpactPoint - StartTrace;
+		AimDir = Hit.ImpactPoint - Hit.TraceStart;
 		AimDir.Normalize();
 	}
 
 	FVector SocketLocation = GetMesh()->GetSocketLocation(DaggerSocketName);
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = Instigator;
-	
-	ASProjectile* Projectile = GetWorld()->SpawnActor<ASProjectile>(DaggerProjectileClass, SocketLocation, AimDir.Rotation(), SpawnParams);
-	if (Projectile != nullptr)
-	{
-		Projectile->SetProjectileDirection(AimDir);
-		Projectile->SetProjectileDamage(GetSkillDamage());
-	}
+
+	CreateProjectile(DaggerProjectileClass, SocketLocation, AimDir.Rotation());
 
 	//DrawDebugLine(GetWorld(), SocketLocation, SocketLocation + AimDir * DaggerRange, FColor::Red, false, 3.f);
 }

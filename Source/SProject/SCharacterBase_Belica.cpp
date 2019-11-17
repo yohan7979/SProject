@@ -26,17 +26,8 @@ void ASCharacterBase_Belica::DoAttack()
 	Super::DoAttack();
 
 	//클라이언트에서 LineTrace를 하고, Hit이 성공하면 서버에게 데미지 요청 + PlayImpact
-	FVector StartLocation, EndLocation;
-	FRotator AimDirection;
-	
-	StartLocation = GetPawnViewLocation();
-	AimDirection = GetControlRotation();
-	EndLocation = StartLocation + AimDirection.Vector() * 5000.f; // TODO: Make Range
-
 	FHitResult Hit;
-	FCollisionQueryParams CollisionParams;
-	CollisionParams.AddIgnoredActor(this);
-	if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECC_GameTraceChannel1, CollisionParams))
+	if (DoHitScanTrace(Hit))
 	{
 		// Request damage to server
 		if (Hit.Actor != nullptr)

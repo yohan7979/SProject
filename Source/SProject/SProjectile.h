@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PreloadContentInterface.h"
 #include "SProjectile.generated.h"
 
 class UProjectileMovementComponent;
@@ -12,7 +13,7 @@ class UParticleSystemComponent;
 class UParticleSystem;
 
 UCLASS()
-class SPROJECT_API ASProjectile : public AActor
+class SPROJECT_API ASProjectile : public AActor, public IPreloadContentInterface
 {
 	GENERATED_BODY()
 	
@@ -28,7 +29,7 @@ public:
 
 public:
 	void SetProjectileDirection(const FVector& Direction);
-	void PlayEffect(UParticleSystem* TargetPS);
+	void PlayEffect(TSoftObjectPtr<UParticleSystem> TargetPS);
 	void SetProjectileDamage(const float BaseDamage) { ProjectileDamage = BaseDamage; }
 
 	UFUNCTION()
@@ -36,6 +37,8 @@ public:
 
 	UFUNCTION()
 	virtual void OnOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
+
+	virtual void AddPreloadContent(FPreloadContentContainer& Collector, bool bIsDedicateServer);
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -48,16 +51,16 @@ protected:
 	UParticleSystemComponent* EffectPSComp;
 
 	UPROPERTY(EditDefaultsOnly)
-	UParticleSystem* SpawnPS;
+	TSoftObjectPtr<UParticleSystem> SpawnPS;
 
 	UPROPERTY(EditDefaultsOnly)
-	UParticleSystem* HitWorldPS;
+	TSoftObjectPtr<UParticleSystem> HitWorldPS;
 
 	UPROPERTY(EditDefaultsOnly)
-	UParticleSystem* HitPawnPS;
+	TSoftObjectPtr<UParticleSystem> HitPawnPS;
 
 	UPROPERTY(EditDefaultsOnly)
-	UParticleSystem* HitNonePS;
+	TSoftObjectPtr<UParticleSystem> HitNonePS;
 
 	UPROPERTY(Transient)
 	float ProjectileDamage;

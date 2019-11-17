@@ -28,7 +28,7 @@ public:
 	bool IsMontangePlaying(EAnimMontageType eAnimType);
 
 private:
-	UPROPERTY(EditDefaultsOnly, Category="AnimMontage")
+	UPROPERTY(EditDefaultsOnly, Category="AnimMontage", meta=(AllowPrivateAccess="true"))
 	TMap<EAnimMontageType, UAnimMontage*> AnimMontageList;
 
 	ASCharacterBase* CachedCharacter;
