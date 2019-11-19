@@ -18,14 +18,17 @@ public:
 	void Init(class USGameInstance* InGameInstance, FStreamableManager& InStreamableManager);
 	void Shutdown();
 	void PreloadContentForURL(FURL InURL);
-
+	
 	void OnPreloadMap(const FString& MapName);
-	void OnWorldInitializedActors(const UWorld::FActorsInitializedParams& ActorInitParams);
+	void OnWorldInitializedActors(const struct UWorld::FActorsInitializedParams& ActorInitParams);
+
 	void BeginPreloadByGameMode(TSubclassOf<AGameModeBase> GameModeClass);
+	void CollectPreloadContents(UClass* InClass);
 	void CollectPreloadContents(UObject* InObject);
 	void StartPreloadContents();
 
 private:
+	UPROPERTY(Transient)
 	class USGameInstance* GameInstance;
 	
 	FStreamableManager* StreamableManager;

@@ -293,3 +293,20 @@ void ASCharacterBase_Kallari::TimelineFinished()
 {
 
 }
+
+void ASCharacterBase_Kallari::AddPreloadContent(FPreloadContentContainer& Collector, bool bIsDedicateServer)
+{
+	Super::AddPreloadContent(Collector, bIsDedicateServer);
+
+	if (!bIsDedicateServer)
+	{
+		if (DaggerProjectileClass)
+		{
+			ASProjectile* DefaultDaggerProjectile = DaggerProjectileClass->GetDefaultObject<ASProjectile>();
+			if (DefaultDaggerProjectile)
+			{
+				DefaultDaggerProjectile->AddPreloadContent(Collector, bIsDedicateServer);
+			}
+		}
+	}
+}

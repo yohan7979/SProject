@@ -57,6 +57,8 @@ public:
 	UFUNCTION()
 	void TimelineFinished();
 
+	virtual void AddPreloadContent(FPreloadContentContainer& Collector, bool bIsDedicateServer);
+
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ASProjectile> DaggerProjectileClass;

@@ -5,6 +5,11 @@
 #include "Engine/GameInstance.h"
 #include "SContentPreloader.h"
 
+USGameSingleton::USGameSingleton(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+
+}
+
 void USGameSingleton::Init(class USGameInstance* InGameInstance)
 {
 	GameInstance = InGameInstance;

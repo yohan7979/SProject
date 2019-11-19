@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Components/TimelineComponent.h"
 #include "STypes.h"
+#include "PreloadContentInterface.h"
 #include "SCharacterBase.generated.h"
 
 class UCameraComponent;
@@ -18,7 +19,7 @@ class UCapsuleComponent;
 class USkill;
 
 UCLASS()
-class SPROJECT_API ASCharacterBase : public ACharacter
+class SPROJECT_API ASCharacterBase : public ACharacter, public IPreloadContentInterface
 {
 	GENERATED_BODY()
 
@@ -83,6 +84,8 @@ public:
 
 	UFUNCTION()
 	void OnHealthChanged(float CurrentHealth, float DamageAmount, AActor* DamageCauser, AController* InstigatorController);
+
+	virtual void AddPreloadContent(FPreloadContentContainer& Collector, bool bIsDedicateServer);
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

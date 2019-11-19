@@ -14,7 +14,7 @@
 UCLASS()
 class SPROJECT_API USGameSingleton : public UObject
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
 
 public:
 	static USGameSingleton* Get()

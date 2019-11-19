@@ -4,6 +4,11 @@
 #include "SGameInstance.h"
 #include "SGameSingleton.h"
 
+USGameInstance::USGameInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+{
+
+}
+
 void USGameInstance::Init()
 {
 	Super::Init();

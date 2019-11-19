@@ -40,6 +40,8 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerDropMeteor(const FVector& TargetLocation);
 
+	virtual void AddPreloadContent(FPreloadContentContainer& Collector, bool bIsDedicateServer);
+
 public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ASProjectile> BaseProjectileClass;

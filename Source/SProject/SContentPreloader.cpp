@@ -3,8 +3,8 @@
 
 #include "SContentPreloader.h"
 #include "SGameInstance.h"
-#include "GameFramework/GameModeBase.h"
 #include "GameMapsSettings.h"
+#include "GameFramework/GameModeBase.h"
 
 USContentPreloader::USContentPreloader(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -51,11 +51,12 @@ void USContentPreloader::OnPreloadMap(const FString& MapName)
 		}
 	}
 
+	GameModeClassName.Empty();
 	PreloadedContents.Empty();
 	PreloadContainer.PreloadList.Empty();
 }
 
-void USContentPreloader::OnWorldInitializedActors(const UWorld::FActorsInitializedParams& ActorInitParams)
+void USContentPreloader::OnWorldInitializedActors(const struct UWorld::FActorsInitializedParams& ActorInitParams)
 {
 	UWorld* World = ActorInitParams.World;
 	
@@ -73,9 +74,8 @@ void USContentPreloader::OnWorldInitializedActors(const UWorld::FActorsInitializ
 
 	if (GameModeClassName.IsEmpty())
 	{
-		//GameModeClassName = UGameMapsSettings::GetGlobalDefaultGameMode();
-
-		//GameModeClass = LoadClass<AGameModeBase>(nullptr, *GameModeClassName);
+		GameModeClassName = UGameMapsSettings::GetGlobalDefaultGameMode();
+		GameModeClass = LoadClass<AGameModeBase>(nullptr, *GameModeClassName);
 	}
 	
 	if (GameModeClass)
@@ -95,6 +95,18 @@ void USContentPreloader::BeginPreloadByGameMode(TSubclassOf<AGameModeBase> GameM
 	StartPreloadContents();
 }
 
+void USContentPreloader::CollectPreloadContents(UClass* InClass)
+{
+	if (InClass)
+	{
+		UObject* DefaultObject = InClass->GetDefaultObject();
+		if (DefaultObject)
+		{
+			CollectPreloadContents(DefaultObject);
+		}
+	}
+}
+
 void USContentPreloader::CollectPreloadContents(UObject* InObject)
 {
 	if (InObject)
@@ -109,10 +121,11 @@ void USContentPreloader::CollectPreloadContents(UObject* InObject)
 
 void USContentPreloader::StartPreloadContents()
 {
-	for (FPreloadInfo PreloadInfo : PreloadContainer.PreloadList)
+	for (const FPreloadInfo& PreloadInfo : PreloadContainer.PreloadList)
 	{
 		if (StreamableManager)
 		{
+			// 싱크 로드
 			TSharedPtr<FStreamableHandle> Handle = StreamableManager->RequestSyncLoad(PreloadInfo.Path, true);
 
 			if (Handle.IsValid())
@@ -120,6 +133,7 @@ void USContentPreloader::StartPreloadContents()
 				UObject* LoadedObject = Handle->GetLoadedAsset();
 				if (LoadedObject)
 				{
+					// GC되지 않게 레퍼런스 저장
 					PreloadedContents.Add(LoadedObject);
 				}
 
@@ -131,6 +145,11 @@ void USContentPreloader::StartPreloadContents()
 						PreloadedContents.Add(LoadedClass->GetDefaultObject());
 					}
 				}
+
+				UE_LOG(LogTemp, Warning, TEXT("** Preload Contents : %s"), *GetNameSafe(LoadedObject));
+
+				// 로드된 오브젝트 내부에서 찾는다.
+				CollectPreloadContents(LoadedObject);
 			}
 		}
 	}

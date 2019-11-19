@@ -156,6 +156,32 @@ void ASCharacterBase_Phase::ThrowStar()
 	CreateProjectile(BaseProjectileClass, SocketLocation, AimDir.Rotation());
 }
 
+void ASCharacterBase_Phase::AddPreloadContent(FPreloadContentContainer& Collector, bool bIsDedicateServer)
+{
+	Super::AddPreloadContent(Collector, bIsDedicateServer);
+
+	if (!bIsDedicateServer)
+	{
+		if (BaseProjectileClass)
+		{
+			ASProjectile* DefaultBaseProjectile = BaseProjectileClass->GetDefaultObject<ASProjectile>();
+			if (DefaultBaseProjectile)
+			{
+				DefaultBaseProjectile->AddPreloadContent(Collector, bIsDedicateServer);
+			}
+		}
+
+		if (MeteorProjectileClass)
+		{
+			ASProjectile* DefaultMeteorProjectile = MeteorProjectileClass->GetDefaultObject<ASProjectile>();
+			if (DefaultMeteorProjectile)
+			{
+				DefaultMeteorProjectile->AddPreloadContent(Collector, bIsDedicateServer);
+			}
+		}
+	}
+}
+
 void ASCharacterBase_Phase::ServerDropMeteor_Implementation(const FVector& TargetLocation)
 {
 	if (MeteorProjectileClass)

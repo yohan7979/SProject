@@ -430,6 +430,11 @@ void ASCharacterBase::CreateProjectile(UClass* InClass, const FVector& SpawnLoca
 	}
 }
 
+void ASCharacterBase::AddPreloadContent(FPreloadContentContainer& Collector, bool bIsDedicateServer)
+{
+	
+}
+
 void ASCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

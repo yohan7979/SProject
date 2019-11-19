@@ -27,10 +27,10 @@ void ASTargetActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	AActor* Owner = GetOwner();
-	if ( Owner )
+	AActor* MyOwner = GetOwner();
+	if ( MyOwner )
 	{
-		OwnerPawn = Cast<ASCharacterBase>(Owner);
+		OwnerPawn = Cast<ASCharacterBase>( MyOwner );
 
 		if ( OwnerPawn )
 		{

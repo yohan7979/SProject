@@ -13,7 +13,7 @@
 UCLASS()
 class SPROJECT_API USGameInstance : public UGameInstance
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
 	
 public:
 	//~ Begin UGameInstance interface
