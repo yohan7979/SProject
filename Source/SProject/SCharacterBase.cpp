@@ -404,9 +404,9 @@ bool ASCharacterBase::ServerPlayImpactEffect_Validate(const FHitResult& HitResul
 	return true;
 }
 
-bool ASCharacterBase::DoHitScanTrace(FHitResult& HitResult) const
+bool ASCharacterBase::DoHitScanTrace(FHitResult& HitResult, const FVector& StartLocation /*= FVector::ZeroVector*/) const
 {
-	FVector StartTrace = GetPawnViewLocation();
+	FVector StartTrace = StartLocation.IsNearlyZero() ? GetPawnViewLocation() : StartLocation;
 	FVector AimDirection = GetControlRotation().Vector();
 	FVector EndTrace = StartTrace + AimDirection * 10000.f; // TODO: Make Range
 

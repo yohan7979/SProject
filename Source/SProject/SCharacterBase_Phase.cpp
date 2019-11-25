@@ -17,6 +17,7 @@ ASCharacterBase_Phase::ASCharacterBase_Phase()
 	DropStartHeight = 200.f;
 	LeftHandSocketName = FName(TEXT("hand_l"));
 	RightHandSocketName = FName(TEXT("hand_r"));
+	EnergyLanceDamageFrequency = 0.2f;
 }
 
 void ASCharacterBase_Phase::BeginPlay()
@@ -58,6 +59,13 @@ void ASCharacterBase_Phase::DoAttack()
 
 void ASCharacterBase_Phase::ExecuteAbilityOne(EAnimMontageType & eAnimType, FName SectionName)
 {
+	FTimerManager& TimerManager = GetWorldTimerManager();
+	if (!TimerManager.IsTimerActive(TimerHandle_EnergyLanceDamage))
+	{
+		TimerManager.SetTimer(TimerHandle_EnergyLanceDamage, this, &ASCharacterBase_Phase::HitScanTraceForEnegryLance, EnergyLanceDamageFrequency, true, 0.82f);
+	}
+
+	bLanceCasting = true;
 }
 
 void ASCharacterBase_Phase::ExecuteAbilityTwo(EAnimMontageType & eAnimType, FName SectionName)
@@ -98,6 +106,28 @@ void ASCharacterBase_Phase::ExecuteAbilityThree(EAnimMontageType & eAnimType, FN
 
 void ASCharacterBase_Phase::ExecuteAbilityFour(EAnimMontageType & eAnimType, FName SectionName)
 {
+}
+
+void ASCharacterBase_Phase::NotifiedSkillFinished(ESkillType SkillType)
+{
+	Super::NotifiedSkillFinished(SkillType);
+
+	FTimerManager& TimerManager = GetWorldTimerManager();
+
+	switch (SkillType)
+	{
+	case ESkillType::One:
+		if (TimerManager.IsTimerActive(TimerHandle_EnergyLanceDamage))
+		{
+			TimerManager.ClearTimer(TimerHandle_EnergyLanceDamage);
+		}
+		bLanceCasting = false;
+		break;
+	default:
+		break;
+	}
+
+
 }
 
 void ASCharacterBase_Phase::StartCastingMeteor()
@@ -146,14 +176,29 @@ void ASCharacterBase_Phase::ThrowStar()
 	const FVector& SocketLocation = GetMesh()->GetSocketLocation(TargetSocketName);
 
 	FHitResult Hit(1.f);
-	if (DoHitScanTrace(Hit))
+	if (DoHitScanTrace(Hit, SocketLocation))
 	{
 		AimDir = Hit.ImpactPoint - Hit.TraceStart;
 		AimDir.Normalize();
 	}
 
-	//FVector SocketLocation = GetMesh()->GetSocketLocation(DaggerSocketName);
 	CreateProjectile(BaseProjectileClass, SocketLocation, AimDir.Rotation());
+}
+
+void ASCharacterBase_Phase::HitScanTraceForEnegryLance()
+{
+	FHitResult Hit(ForceInit);
+	if (DoHitScanTrace(Hit))
+	{
+		// Request damage to server
+		if (Hit.Actor != nullptr)
+		{
+			ServerRequestDealDamage(Hit.GetActor(), GetSkillDamage());
+
+			// play impact fx (on server, multicast)
+			ServerPlayImpactEffect(Hit);
+		}
+	}
 }
 
 void ASCharacterBase_Phase::AddPreloadContent(FPreloadContentContainer& Collector, bool bIsDedicateServer)

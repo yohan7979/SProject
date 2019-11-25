@@ -31,11 +31,14 @@ public:
 	virtual void ExecuteAbilityThree(EAnimMontageType& eAnimType, FName SectionName = NAME_None);
 	virtual void ExecuteAbilityFour(EAnimMontageType& eAnimType, FName SectionName = NAME_None);
 
+	virtual void NotifiedSkillFinished(ESkillType SkillType);
+
 	void StartCastingMeteor();
 	void EndCastingMeteor();
 	void DropMeteor();
 
 	void ThrowStar();
+	void HitScanTraceForEnegryLance();
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerDropMeteor(const FVector& TargetLocation);
@@ -61,7 +64,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Meteor")
 	float DropStartHeight;
 
+	UPROPERTY(EditDefaultsOnly, Category="EnergyLance")
+	float EnergyLanceDamageFrequency;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bLanceCasting;
+
 private:
 	UPROPERTY()
 	ASTargetActor* TargetActor;
+
+	FTimerHandle TimerHandle_EnergyLanceDamage;
 };

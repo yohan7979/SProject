@@ -6,7 +6,7 @@
 
 USGameInstance::USGameInstance(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-
+	GameSingleton = nullptr;
 }
 
 void USGameInstance::Init()

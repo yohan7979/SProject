@@ -89,7 +89,7 @@ public:
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	bool DoHitScanTrace(FHitResult& HitResult) const;
+	bool DoHitScanTrace(FHitResult& HitResult, const FVector& StartLocation = FVector::ZeroVector) const;
 	void CreateProjectile(UClass* InClass, const FVector& SpawnLocation, const FRotator& SpawnRotation);
 	
 protected:

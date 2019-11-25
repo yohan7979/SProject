@@ -7,7 +7,8 @@
 
 USGameSingleton::USGameSingleton(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-
+	GameInstance = nullptr;
+	ContentPreloader = nullptr;
 }
 
 void USGameSingleton::Init(class USGameInstance* InGameInstance)
